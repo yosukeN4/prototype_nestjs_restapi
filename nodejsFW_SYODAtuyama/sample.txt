@@ -1,0 +1,4816 @@
+﻿------------------------------------------
+Node.jsフレームワーク超入門　掲載リスト
+------------------------------------------
+■リスト1-1
+------------------------------------------
+const http = require('http')
+
+
+var server = http.createServer(
+  (req, res) => {
+    res.end('This is sample content.')
+  }
+)
+server.listen(3000)
+
+
+
+------------------------------------------
+■リスト1-2
+------------------------------------------
+{
+  "name": "node_app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "SYODA-Tuyano",
+  "license": "ISC"
+}
+
+
+
+------------------------------------------
+■リスト1-3
+------------------------------------------
+"scripts": {
+  "start": "node ./app.js"
+},
+
+
+
+------------------------------------------
+■リスト1-4
+------------------------------------------
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta http-equiv="content-type" 
+    content="text/html; charset=UTF-8">
+  <title>Index</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+  <h1 class="display-1">Index</h1>
+  <p>これはサンプルのページです。</p>
+</body>
+</html>
+
+
+
+------------------------------------------
+■リスト1-5
+------------------------------------------
+const http = require('http');
+const fs = require('fs');
+const url = require('url')
+
+
+const html = fs.readFileSync('./index.html', 'UTF-8')
+
+
+var server = http.createServer(
+  (req, res) => {
+    const address = url.parse(req.url)
+    res.writeHead(200, {'Content-Type': 'text/html'})
+    switch(address.pathname) {
+      case '/':
+      res.write(html)
+      break
+      default:
+      res.write('<html><body><h1>NO PAGE.</h1></body></html>')
+    }
+    res.end()
+  }
+);
+
+
+server.listen(3000);
+console.log('Start server http://localhost:3000/');
+
+
+
+------------------------------------------
+■リスト2-1
+------------------------------------------
+{
+  "name": "express-app",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1"
+  }
+}
+
+
+
+------------------------------------------
+■リスト2-2
+------------------------------------------
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+
+
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+
+
+var app = express();
+
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
+
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+
+module.exports = app;
+
+
+
+------------------------------------------
+■リスト2-3
+------------------------------------------
+var express = require('express');
+var router = express.Router();
+
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+
+
+module.exports = router;
+
+
+
+------------------------------------------
+■リスト2-4
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト2-5
+------------------------------------------
+var express = require('express')
+var app = express()
+
+
+app.get('/', (request, response) => {
+  response.send(`<html><body>
+    <h1>Express</h1>
+    <p>※これはサンプルのページです。</p>
+  </body></html>`)
+})
+
+
+module.exports = app;
+
+
+
+------------------------------------------
+■リスト2-6
+------------------------------------------
+const express = require('express')
+const router = express.Router()
+
+
+router.get('/', function(req, res, next) {
+  const data = {
+    title:'Hello!',
+    message:'これは、サンプルで追加したページです。'
+  }
+  res.render('hello', data);
+})
+
+
+module.exports = router
+
+
+
+------------------------------------------
+■リスト2-7
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p><%= message %></p>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト2-8
+------------------------------------------
+const helloRouter = require('./routes/hello');
+app.use('/hello', helloRouter);
+
+
+
+------------------------------------------
+■リスト2-9
+------------------------------------------
+const express = require('express')
+const router = express.Router()
+
+
+const db = [
+  {name:'taro', mail:'taro@yamada'},
+  {name:'hanako', mail:'hanako@flower'},
+  {name:'sachiko', mail:'sachiko@happy'},
+  {name:'jiro', mail:'jiro@change'},
+]
+
+
+router.get('/', function(req, res, next) {
+  const data = {
+    title:'Hello!',
+    message:'データを表示します。',
+    db: db
+  }
+  res.render('hello', data);
+})
+
+
+module.exports = router
+
+
+
+------------------------------------------
+■リスト2-10
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container">
+    <h1 class="display-4"><%= title %></h1>
+    <p><%= message %></p>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Mail</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% for(var item of db) { %>
+        <tr>
+          <td><%= item.name %></td>
+          <td><%= item.mail %></td>
+        </tr>
+      <% } %>
+      </tbody>
+    </table>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト2-11
+------------------------------------------
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+  <h1 class="display-2 my-2 text-primary"><%= title %></h1>
+  <hr class="my-2 p-0">
+
+
+
+------------------------------------------
+■リスト2-12
+------------------------------------------
+<div class="m-4">&nbsp;</div>
+<div style="width:100%" 
+  class="fixed-bottom bg-primary p-2">
+  <h6 class="text-center text-white m-0">
+    copyright 2022 SYODA-Tuyano.</h6>
+</div>
+</body>
+</html>
+
+
+
+------------------------------------------
+■リスト2-13
+------------------------------------------
+<%- include('header', title) %>
+
+
+<p class="my-2"><%= message %></p>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Mail</th>
+    </tr>
+  </thead>
+  <tbody>
+  <% for(var item of db) { %>
+    <tr>
+      <td><%= item.name %></td>
+      <td><%= item.mail %></td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>
+
+
+<%- include('footer') %>
+
+
+
+------------------------------------------
+■リスト2-14
+------------------------------------------
+<%- include('header', title) %>
+<p>※この部分が、index.ejsによるコンテンツ部分です。</p>
+<%- include('footer') %>
+
+
+
+------------------------------------------
+■リスト2-15
+------------------------------------------
+<%- include('header', title) %>
+
+
+<p class="my-2"><%= message %></p>
+<form method="post" action="/hello">
+  <div class="mb-3">
+    <label for="id" class="form-label">ID</label>
+    <input type="text" class="form-control" 
+      id="id" name="id" value="<%=id %>">
+  </div>
+  <div class="mb-3">
+    <label for="pass" class="form-label">Password</label>
+    <input type="password" class="form-control" 
+      id="pass" name="pass" value="<%=pass %>">
+  </div>
+  <button type="submit" class="btn btn-primary">送信</button>
+</form>
+
+
+<%- include('footer') %>
+
+
+
+------------------------------------------
+■リスト2-16
+------------------------------------------
+const express = require('express')
+const router = express.Router()
+
+
+router.get('/', function(req, res, next) {
+  const data = {
+    title:'Hello!',
+    message:'フォームを入力して下さい。',
+    id:'',
+    pass:''
+  }
+  res.render('hello', data);
+})
+
+
+router.post('/', function(req, res, next) {
+  const data = {
+    title:'Hello!',
+    message:req.body.id + 'さん（パスワード' + req.body.pass.length + '文字）',
+    id:req.body.id,
+    pass:req.body.pass
+  }
+  res.render('hello', data);
+})
+
+
+module.exports = router
+
+
+
+------------------------------------------
+■リスト2-17
+------------------------------------------
+<%- include('header', title) %>
+
+
+<script>
+async function ajax() {
+  const data = {
+    id:document.querySelector('#id').value,
+    pass:document.querySelector('#pass').value
+  }
+  const resp = await fetch('/hello/ajax', {
+      method:'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+  })
+  const result = await resp.json()
+  document.querySelector('#msg').textContent = result.message
+}
+</script>
+<p class="my-2" id="msg"><%= message %></p>
+<div class="mb-3">
+  <label for="id" class="form-label">ID</label>
+  <input type="text" class="form-control" 
+    id="id" name="id" value="<%=id %>">
+</div>
+<div class="mb-3">
+  <label for="pass" class="form-label">Password</label>
+  <input type="password" class="form-control" 
+    id="pass" name="pass" value="<%=pass %>">
+</div>
+<button class="btn btn-primary" onclick="ajax()">送信</button>
+
+
+<%- include('footer') %>
+
+
+
+------------------------------------------
+■リスト2-18
+------------------------------------------
+router.post('/ajax', function(req, res, next) {
+  const result = {
+    id:req.body.id,
+    pass:req.body.pass,
+    message:'こんにちは、' + req.body.id + 'さん！'
+  }
+  res.send(result)
+})
+
+
+
+------------------------------------------
+■リスト2-19
+------------------------------------------
+const session = require('express-session')
+
+
+
+------------------------------------------
+■リスト2-20
+------------------------------------------
+const ses_opt = {
+  secret:'** secret key **',
+  resave:false,
+  saveUninitialized:false,
+  cookie:{ maxAge: 60 * 60 * 24 }
+}
+app.use(session(ses_opt))
+
+
+
+------------------------------------------
+■リスト2-21
+------------------------------------------
+router.get('/', function(req, res, next) {
+  if (req.session.comments == undefined) {
+    req.session.comments = []
+  }
+  const data = {
+    title:'Hello!',
+    message:'フォームを入力して下さい。',
+    comments:req.session.comments
+  }
+  res.render('hello', data);
+})
+
+
+router.post('/', function(req, res, next) {
+  req.session.comments.unshift(req.body.comment)
+  const data = {
+    title:'Hello!',
+    message:'※コメントの保存',
+    comments:req.session.comments
+  }
+  res.render('hello', data);
+})
+
+
+
+------------------------------------------
+■リスト2-22
+------------------------------------------
+<%- include('header', title) %>
+
+
+<p class="my-2" id="msg"><%= message %></p>
+<form method="post" action="/hello">
+  <div class="mb-3">
+    <label for="comment" class="form-label">Message</label>
+    <input type="text" class="form-control" 
+      id="comment" name="comment">
+  </div>
+  <button type="submit" class="btn btn-primary">送信</button>
+</form>
+
+
+<table class="table">
+  <thead>
+    <tr><th>Comment</th></tr>
+  </thead>
+  <tbody>
+    <% for (item of comments) { %>
+    <tr><td><%=item %></td></tr>
+    <% } %>
+  </tbody>
+</table>
+<%- include('footer') %>
+
+
+
+------------------------------------------
+■リスト2-23
+------------------------------------------
+DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+
+
+
+------------------------------------------
+■リスト2-24
+------------------------------------------
+DATABASE_URL="file:./data.db"
+
+
+
+------------------------------------------
+■リスト2-25
+------------------------------------------
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+------------------------------------------
+■リスト2-26
+------------------------------------------
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+
+------------------------------------------
+■リスト2-27
+------------------------------------------
+model User {
+  id  Int  @id @default(autoincrement())
+  name  String  @unique
+  email  String?
+  age  Int  @default(0)
+  updatedAt  DateTime  @updatedAt
+}
+
+
+
+------------------------------------------
+■リスト2-28
+------------------------------------------
+CREATE TABLE "User" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
+    "email" TEXT,
+    "age" INTEGER NOT NULL DEFAULT 0,
+    "updatedAt" DATETIME NOT NULL
+);
+CREATE UNIQUE INDEX "User_name_key" ON "User"("name");
+
+
+
+------------------------------------------
+■リスト2-29
+------------------------------------------
+const express = require('express')
+const router = express.Router()
+
+
+const ps = require('@prisma/client')
+const prisma = new ps.PrismaClient()
+
+
+module.exports = router
+
+
+
+------------------------------------------
+■リスト2-30
+------------------------------------------
+const dbRouter = require('./routes/db')
+app.use('/db', dbRouter)
+
+
+
+------------------------------------------
+■リスト2-31
+------------------------------------------
+router.get('/', async function(req, res, next) {
+  const users = await prisma.user.findMany()
+  const data = {
+    title:'Prisma',
+    message:'Userテーブルのレコード一覧。',
+    data:users
+  }
+  res.render('db', data);
+})
+
+
+
+------------------------------------------
+■リスト2-32
+------------------------------------------
+<%- include('header', title) %>
+
+
+<p class="my-2" id="msg"><%= message %></p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>id</th><th>name</th>
+      <th>email</th><th>age</th>
+      <th>update</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for (item of data) { %>
+    <tr>
+      <td><%=item.id %></td>
+      <td><%=item.name %></td>
+      <td><%=item.email %></td>
+      <td><%=item.age %></td>
+      <td><%=item.updatedAt %></td>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<%- include('footer') %>
+
+
+
+------------------------------------------
+■リスト2-33
+------------------------------------------
+<form method="post" action="/db">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" 
+      id="name" name="name">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" class="form-control" 
+      id="email" name="email">
+  </div>
+  <div class="mb-3">
+    <label for="age" class="form-label">Age</label>
+    <input type="number" class="form-control" 
+      id="age" name="age">
+  </div>
+  <button type="submit" class="btn btn-primary">送信</button>
+</form>
+
+
+
+------------------------------------------
+■リスト2-34
+------------------------------------------
+router.post('/', async function(req, res, next) {
+  const {name, email, age} = req.body
+  await prisma.user.create({
+    data:{name:name, email:email, age:parseInt(age)}
+  })
+  res.redirect('/db')
+})
+
+
+
+------------------------------------------
+■リスト2-35
+------------------------------------------
+<%- include('header', title) %>
+<h6 class="my-3" id="msg"><%= message %></h6>
+<form method="post" action="/db/edit">
+  <input type="hidden" name="id" id="id" value="<%=user.id %>">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" 
+      id="name" name="name" value="<%=user.name %>">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="email" class="form-control" 
+      id="email" name="email" value="<%=user.email %>">
+  </div>
+  <div class="mb-3">
+    <label for="age" class="form-label">Age</label>
+    <input type="number" class="form-control" 
+      id="age" name="age" value="<%=user.age %>">
+  </div>
+  <button type="submit" class="btn btn-primary">送信</button>
+</form>
+<%- include('footer') %>
+
+
+
+------------------------------------------
+■リスト2-36
+------------------------------------------
+router.get('/edit/:id', async function(req, res, next) {
+  const { id } = req.params
+  const user = await prisma.user.findFirst(
+    { where:{ id:parseInt(id) }})
+  const data = {
+    title:'Prisma',
+    message:'ID = ' + id + ' のデータの更新。',
+    user:user
+  }
+  res.render('edit', data)
+})
+
+
+router.post('/edit', async function(req, res, next) {
+  const {id, name, email, age} = req.body
+  await prisma.user.update({
+    where:{ id:parseInt(id) },
+    data:{name:name, email:email, age:parseInt(age)}
+  })
+  res.redirect('/db')
+})
+
+
+
+------------------------------------------
+■リスト2-37
+------------------------------------------
+<table class="table">
+  <thead>
+    <tr>
+      <th>id</th><th>name</th>
+      <th>email</th><th>age</th>
+      <th>update</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for (item of data) { %>
+    <tr>
+      <td><%=item.id %></td>
+      <td><%=item.name %></td>
+      <td><%=item.email %></td>
+      <td><%=item.age %></td>
+      <td><%=item.updatedAt %></td>
+      <th><a href="/db/edit/<%= item.id %>">編集</a></th>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+
+
+
+------------------------------------------
+■リスト2-38
+------------------------------------------
+<table class="table">
+  <thead>
+    <tr>
+      <th>id</th><th>name</th>
+      <th>email</th><th>age</th>
+      <th>update</th>
+      <th></th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for (item of data) { %>
+    <tr>
+      <td><%=item.id %></td>
+      <td><%=item.name %></td>
+      <td><%=item.email %></td>
+      <td><%=item.age %></td>
+      <td><%=item.updatedAt %></td>
+      <th><a href="/db/edit/<%= item.id %>">編集</a></th>
+      <th><a href="#" onsubmit="false" 
+        onclick="doDelete(<%= item.id %>)">削除</a></th>
+    </tr>
+    <% } %>
+  </tbody>
+</table>
+<form id="delform" method="post" action=""></form>
+<script>
+function doDelete(id) {
+  if (window.confirm('id=' + id + 'のレコードを削除しますか？')) {
+    const frm = document.querySelector('#delform')
+    frm.action = '/db/delete/' + id
+    frm.submit()
+  }
+}
+</script>
+
+
+
+------------------------------------------
+■リスト2-39
+------------------------------------------
+router.post('/delete/:id', async function(req, res, next) {
+  const {id} = req.params
+  await prisma.user.delete({where:{id:parseInt(id)}})
+  res.redirect('/db')
+})
+
+
+
+------------------------------------------
+■リスト3-1
+------------------------------------------
+module.exports = {
+  friendlyName: 'View hello',
+  description: 'Display "Hello" page.',
+  exits: {
+    success: {
+      viewTemplatePath: 'pages/hello'
+    }
+  },
+  fn: async function () {
+    return {};
+  }
+};
+
+
+
+------------------------------------------
+■リスト3-2
+------------------------------------------
+fn: async function () {
+  return {
+    title: '新しいアクション！',
+    message: 'これは、新たに作成したアクションです。'};
+}
+
+
+
+------------------------------------------
+■リスト3-3
+------------------------------------------
+<div id="hello" v-cloak>
+  <h1><%= title %></h1>
+  <p><%= message %></p>
+</div>
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-4
+------------------------------------------
+  '/hello': { action: 'view-hello' },
+
+
+
+------------------------------------------
+■リスト3-5
+------------------------------------------
+module.exports = {
+  index: async function (req, res) {
+    return res.json({
+      todo: 'index() is not implemented yet!'
+    });
+  },
+
+
+  add: async function (req, res) {
+    return res.json({
+      todo: 'add() is not implemented yet!'
+    });
+  },
+
+
+  edit: async function (req, res) {
+    return res.json({
+      todo: 'edit() is not implemented yet!'
+    });
+  },
+
+
+  delete: async function (req, res) {
+    return res.json({
+      todo: 'delete() is not implemented yet!'
+    });
+  }
+};
+
+
+
+------------------------------------------
+■リスト3-6
+------------------------------------------
+'/sample': { controller: 'SampleController', action: 'index' },
+
+
+
+------------------------------------------
+■リスト3-7
+------------------------------------------
+index: async function (req, res) {
+  return res.view({
+    title:'Sample!',
+    message:'これはサンプルで作成したコントローラーです。'
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-8
+------------------------------------------
+<div id="hello" v-cloak>
+  <h1 class="display-4"><%= title %></h1>
+  <p><%= message %></p>
+</div>
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-9
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%=title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/styles/importer.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <%- body %>
+    <div class="m-4">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-2">
+      <h6 class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</h6>
+    </div>
+    <script src="/dependencies/sails.io.js"></script>
+    <script src="/js/pages/hello.page.js"></script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト3-10
+------------------------------------------
+<div id="hello" v-cloak>
+  <h1 class="display-4"><%= title %></h1>
+  <p><%= message %></p>
+  <form method="post" action="/sample">
+    <div class="mb-3">
+      <label for="msg" class="form-label">ID</label>
+      <input type="text" class="form-control" 
+        id="msg" name="msg">
+    </div>
+    <button type="submit" class="btn btn-secondary">送信</button>
+  </form>  
+</div>
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-11
+------------------------------------------
+index: async function (req, res) {
+  message = '名前を入力：'
+  if (req.method == 'POST'){
+    message = 'こんにちは、' + req.body.msg + 'さん！'
+  }
+  return res.view({
+    title:'Sample!',
+    message:message
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-12
+------------------------------------------
+'GET /sample': { controller: 'SampleController', action: 'index' },
+'POST /sample': { controller: 'SampleController', action: 'index_posted' },
+
+
+
+------------------------------------------
+■リスト3-13
+------------------------------------------
+<div id="hello" v-cloak>
+  <h1 class="display-4"><%= title %></h1>
+  <p><%= message %></p>
+  <form method="post" action="/sample">
+    <div class="mb-3">
+      <label for="msg" class="form-label">ID</label>
+      <input type="text" class="form-control" 
+        id="msg" name="msg" value="<%=msg %>">
+    </div>
+    <button type="submit" class="btn btn-secondary">送信</button>
+  </form>  
+</div>
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-14
+------------------------------------------
+index: async function (req, res) {
+  message = '名前を入力：'
+  msg = ''
+  return res.view({
+    title:'Sample!',
+    message:message
+  })
+},
+index_posted: async function (req, res) {
+  msg = req.body.msg
+  message = 'こんにちは、' + msg + 'さん！'
+  return res.view({
+    title:'Sample!',
+    message:message,
+    msg:msg
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-15
+------------------------------------------
+'GET /sample/:id?': { controller: 'SampleController', action: 'index' },
+
+
+
+------------------------------------------
+■リスト3-16
+------------------------------------------
+index: async function (req, res) {
+  if (req.param('id')) {
+    message = 'あなたのIDは、' + req.param('id') + ' です。'
+  } else {
+    message = '名前を入力：'
+  }
+  if (req.method == 'POST'){
+    message = 'こんにちは、' + req.body.msg + 'さん！'
+  }
+  return res.view({
+    title:'Sample!',
+    message:message
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-17
+------------------------------------------
+index: async function (req, res) {
+  if (req.param('id')) {
+    message = 'あなたのIDは、' + req.param('id') + ' です。'
+  } else {
+    message = '名前を入力：'
+  }
+  if (req.query.name) {
+    message += '（あなたの名前は、' + req.query.name + 'ですね？）'
+  }
+  if (req.method == 'POST'){
+    message = 'こんにちは、' + req.body.msg + 'さん！'
+  }
+  return res.view({
+    title:'Sample!',
+    message:message
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-18
+------------------------------------------
+module.exports.session = {
+  secret: '67c8ff0e3dde660faa1eb02027f75207',
+};
+
+
+
+------------------------------------------
+■リスト3-19
+------------------------------------------
+<ul>
+  <% for(var item of data) { %>
+    <li><%= item %></li>
+  <% } %>
+</ul>
+
+
+
+------------------------------------------
+■リスト3-20
+------------------------------------------
+index: async function (req, res) {
+  if (!req.session.data) {
+    req.session.data = []
+  }
+  return res.view({
+    title:'Sample!',
+    message:'メッセージを送信して下さい。',
+    data:req.session.data
+  })
+},
+
+
+index_posted: async function (req, res) {
+  msg = req.body.msg
+  req.session.data.unshift(msg)
+  return res.redirect('/sample')
+},
+
+
+
+------------------------------------------
+■リスト3-21
+------------------------------------------
+module.exports.datastores = {
+  default: {
+  },
+};
+
+
+
+------------------------------------------
+■リスト3-22
+------------------------------------------
+module.exports.datastores = {
+  default: {
+    adapter: 'sails-mysql',
+    host:'localhost',
+    port: 3306,
+    user: 'root',
+    password:'',
+    database: 'sails_db'
+  }
+};
+
+
+
+------------------------------------------
+■リスト3-23
+------------------------------------------
+module.exports.models = {
+  // schema: true,
+  // migrate: 'alter',
+
+
+  attributes: {
+    createdAt: { type: 'number', autoCreatedAt: true, },
+    updatedAt: { type: 'number', autoUpdatedAt: true, },
+    id: { type: 'number', autoIncrement: true, },
+  },
+
+
+  dataEncryptionKeys: {
+    default: 'rhuTMHgg+qgvjjcrAs8FJyhMXtqrHzBwlKFh8X3NOjE='
+  },
+
+
+  cascadeOnDestroy: true
+};
+
+
+
+------------------------------------------
+■リスト3-24
+------------------------------------------
+module.exports = {
+  attributes: {
+    message: { type: 'string', required: true },
+    user: { type: 'string', required: true },
+    email: { type: 'string' }
+  },
+};
+
+
+
+------------------------------------------
+■リスト3-25
+------------------------------------------
+module.exports = {
+  index: async function (req, res) {
+    var data = await Board.find()
+    return res.view({
+      title:'Sample!',
+      msg:'Boardモデルを利用します。',
+      data:data
+    })
+  },
+};
+
+
+
+------------------------------------------
+■リスト3-26
+------------------------------------------
+<h1 class="display-4"><%= title %></h1>
+<p><%= msg %></p>
+<ul class="mt-4 list-group">
+  <% for(var item of data) { %>
+    <li class="list-group-item">
+      <%= item.message %> (<%=item.user %>)
+    </li>
+  <% } %>
+</ul>
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-27
+------------------------------------------
+'GET /board': { controller: 'BoardController', action: 'index' },
+
+
+
+------------------------------------------
+■リスト3-28
+------------------------------------------
+{"$$indexCreated":{"fieldName":"id","unique":true,"sparse":false}}
+{"id":1, "message":"テスト送信", "user":"taro", "email":"taro@yamada", "createdAt":1645580100000, "updatedAt":1645580100000, "_id":1}
+{"id":2, "message":"こんにちは！", "user":"hanako", "email":"hanako@flower", "createdAt":1645580200000, "updatedAt":1645580200000, "_id":2}
+
+
+
+------------------------------------------
+■リスト3-29
+------------------------------------------
+<form method="post" action="/board">
+  <div class="mb-3">
+    <label for="message" class="form-label">Message</label>
+    <input type="text" class="form-control" 
+      id="message" name="message">
+  </div>
+  <div class="mb-3">
+    <label for="user" class="form-label">User</label>
+    <input type="text" class="form-control" 
+      id="user" name="user">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="text" class="form-control" 
+      id="email" name="email">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form> 
+
+
+
+------------------------------------------
+■リスト3-30
+------------------------------------------
+index_posted: async function (req, res) {
+  await Board.create(req.body)
+  return res.redirect('/board')
+},
+
+
+
+------------------------------------------
+■リスト3-31
+------------------------------------------
+'POST /board': { controller: 'BoardController', action: 'index_posted' },
+
+
+
+------------------------------------------
+■リスト3-32
+------------------------------------------
+<h1 class="display-4"><%= title %></h1>
+<p><%= msg %></p>
+<form method="post" action="/board/edit/<%=data.id %>">
+  <div class="mb-3">
+    <label for="message" class="form-label">Message</label>
+    <input type="text" class="form-control" 
+      id="message" name="message" value="<%=data.message %>">
+  </div>
+  <div class="mb-3">
+    <label for="user" class="form-label">User</label>
+    <input type="text" class="form-control" 
+      id="user" name="user" value="<%=data.user %>">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="text" class="form-control" 
+      id="email" name="email" value="<%=data.email %>">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form> 
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-33
+------------------------------------------
+edit: async function (req, res) {
+  const id = parseInt(req.param('id'))
+  var data = await Board.findOne({id:id})
+  return res.view({
+    title:'Sample!',
+    msg:'Boardモデルを更新します。',
+    data:data
+  })
+},
+
+
+edit_posted: async function (req, res) {
+  const id = parseInt(req.param('id'))
+  await Board.updateOne({id:id}).set(req.body)
+  return res.redirect('/board')
+},
+
+
+
+------------------------------------------
+■リスト3-34
+------------------------------------------
+'GET /board/edit/:id': { controller: 'BoardController', action: 'edit' },
+'POST /board/edit/:id': { controller: 'BoardController', action: 'edit_posted' },
+
+
+
+------------------------------------------
+■リスト3-35
+------------------------------------------
+<h1 class="display-4"><%= title %></h1>
+<p><%= msg %></p>
+<form method="post" action="/board/delete/<%=data.id %>">
+  <p>削除するメッセージ：
+    <span class="border border-danger p-1">
+      <%=data.message %>" (<%= data.user %>)
+    </span>
+  </p>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form> 
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-36
+------------------------------------------
+delete: async function (req, res) {
+  const id = parseInt(req.param('id'))
+  var data = await Board.findOne({id:id})
+  return res.view({
+    title:'Sample!',
+    msg:'Boardモデルを削除します。',
+    data:data
+  })
+},
+
+
+delete_posted: async function (req, res) {
+  const id = parseInt(req.param('id'))
+  await Board.destroyOne({id:id})
+  return res.redirect('/board')
+},
+
+
+
+------------------------------------------
+■リスト3-37
+------------------------------------------
+'GET /board/delete/:id': { controller: 'BoardController', action: 'delete' },
+'POST /board/delete/:id': { controller: 'BoardController', action: 'delete_posted' },
+
+
+
+------------------------------------------
+■リスト3-38
+------------------------------------------
+<h1 class="display-4"><%= title %></h1>
+<p><%= msg %></p>
+<form method="post" action="/board/find">
+  <div class="mb-3">
+    <label for="find" class="form-label">Find:</label>
+    <input type="text" class="form-control" 
+      id="find" name="find" value="<%= find %>">
+  </div>
+  <button type="submit" class="btn btn-secondary">検索</button>
+</form> 
+<ul class="mt-4 list-group">
+  <% for(var item of data) { %>
+    <li class="list-group-item">
+      <%= item.message %> (<%=item.user %>)
+    </li>
+  <% } %>
+</ul>
+<%- exposeLocalsToBrowser() %>
+
+
+
+------------------------------------------
+■リスト3-39
+------------------------------------------
+find: async function (req, res) {
+  var data = await Board.find();
+  return res.view({
+    title:'Sample!',
+    msg:'Boardモデルを検索します。',
+    find:'',
+    data:data
+  })
+},
+
+
+find_posted: async function (req, res) {
+  var data = await Board.find({
+    user: req.body.find
+  })
+  return res.view('board/find', {
+    title:'Sample!',
+    msg:'Boardモデルの検索「' + req.body.find + '」',
+    find:req.body.find,
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-40
+------------------------------------------
+'GET /board/find': { controller: 'BoardController', action: 'find' },
+'POST /board/find': { controller: 'BoardController', action: 'find_posted' },
+
+
+
+------------------------------------------
+■リスト3-41
+------------------------------------------
+find_posted: async function (req, res) {
+  var data = await Board.find({
+    message: {contains: req.body.find}
+  })
+  return res.view('board/find', {
+    title:'Sample!',
+    msg:'Boardモデルの検索「' + req.body.find + '」',
+    find:req.body.find,
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-42
+------------------------------------------
+find_posted: async function (req, res) {
+  const max = parseInt(req.body.find)
+  var data = await Board.find({
+    id: {'<=': max}
+  })
+  return res.view('board/find', {
+    title:'Sample!',
+    msg:'Boardモデルの検索「' + req.body.find + '」',
+    find:req.body.find,
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-43
+------------------------------------------
+find_posted: async function (req, res) {
+  var data = await Board.find({
+    message: {contains: req.body.find},
+    user: {contains: req.body.find}
+  })
+  return res.view('board/find', {
+    title:'Sample!',
+    msg:'Boardモデルの検索「' + req.body.find + '」',
+    find:req.body.find,
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-44
+------------------------------------------
+find_posted: async function (req, res) {
+  const arr = req.body.find.split(',')
+  var data = await Board.find({
+    id: {
+      '>=': parseInt(arr[0]),
+      '<=': parseInt(arr[1])
+    }
+  })
+  return res.view('board/find', {
+    title:'Sample!',
+    msg:'Boardモデルの検索「' + req.body.find + '」',
+    find:req.body.find,
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-45
+------------------------------------------
+find_posted: async function (req, res) {
+  var data = await Board.find({
+    or: [
+      { message: {contains: req.body.find} },
+      { user: {contains: req.body.find} }
+    ]
+  })
+  return res.view('board/find', {
+    title:'Sample!',
+    msg:'Boardモデルの検索「' + req.body.find + '」',
+    find:req.body.find,
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-46
+------------------------------------------
+find: async function (req, res) {
+  var data = await Board.find({
+    sort:['user ASC', 'createdAt DESC']
+  })
+  return res.view({
+    title:'Sample!',
+    msg:'Boardモデルを検索します。',
+    find:'',
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト3-47
+------------------------------------------
+find_posted: async function (req, res) {
+  var data = await Board.find({
+    where: {
+      message: {contains: req.body.find}
+    },
+    sort: 'user ASC'
+  })
+  return res.view('board/find', {
+    title:'Sample!',
+    msg:'Boardモデルの検索「' + req.body.find + '」',
+    find:req.body.find,
+    data:data
+  })
+},
+
+
+
+------------------------------------------
+■リスト4-1
+------------------------------------------
+import Server from '@ioc:Adonis/Core/Server'
+
+
+Server.middleware.register([
+  () => import('@ioc:Adonis/Core/BodyParser'),
+])
+
+
+Server.middleware.registerNamed({
+})
+
+
+
+------------------------------------------
+■リスト4-2
+------------------------------------------
+import Route from '@ioc:Adonis/Core/Route'
+
+
+Route.get('/', async ({ view }) => {
+  return view.render('welcome')
+})
+
+
+
+------------------------------------------
+■リスト4-3
+------------------------------------------
+Route.get('/', async ({ view }) => {
+  const data = {
+    title:'AdonisJS Sample',
+    message:'これはサンプルで用意したページです。'
+  }
+  return view.render('welcome',data)
+})
+
+
+
+------------------------------------------
+■リスト4-4
+------------------------------------------
+<body>
+  <main>
+    <div>
+      <h1 class="title">{{title}}</h1>
+      <p class="subtitle">
+        {{message}}
+      </p>
+    </div>
+  </main>
+</body>
+
+
+
+------------------------------------------
+■リスト4-5
+------------------------------------------
+// import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+
+
+export default class SamplesController {}
+
+
+
+------------------------------------------
+■リスト4-6
+------------------------------------------
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+
+
+export default class SamplesController {
+  public async index(ctx: HttpContextContract) {
+    const data = {
+      title: 'Sample',
+      message: 'これは、SamplesControllerのindexアクションです。'
+    }
+    return ctx.view.render('samples/index', data)
+  }
+}
+
+
+
+------------------------------------------
+■リスト4-7
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-4">{{title}}</h1>
+    <hr class="my-2">
+    
+    <p>{{message}}</p>
+
+
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト4-8
+------------------------------------------
+Route.get('/sample', 'SamplesController.index')
+
+
+
+------------------------------------------
+■リスト4-9
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>{{title}}</strong>
+    </h1>
+    <hr class="my-2">
+    
+    @!section('body')
+
+
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト4-10
+------------------------------------------
+@layout('layouts/main')
+@set('title', title)
+
+
+@section('body')
+<p>{{message}}</p>
+@end
+
+
+
+------------------------------------------
+■リスト4-11
+------------------------------------------
+@section('body')
+<p>{{message}}</p>
+<form method="post" action="/sample">
+  <div class="mb-3">
+    <label for="msg" class="form-label">Message</label>
+    <input type="text" class="form-control" 
+      id="msg" name="msg">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form>  
+@end
+
+
+
+------------------------------------------
+■リスト4-12
+------------------------------------------
+export default class SamplesController {
+
+
+  public async index(ctx: HttpContextContract) {
+    const data = {
+      title: 'Sample',
+      message: 'お名前をどうぞ。'
+    }
+    return ctx.view.render('samples/index', data)
+  }
+
+
+  public async index_posted(ctx: HttpContextContract) {
+    const msg = ctx.request.input('msg')
+    const data = {
+      title: 'Sample',
+      message: 'こんにちは、' + msg + 'さん！'
+    }
+    return ctx.view.render('samples/index', data)
+  }
+}
+
+
+
+------------------------------------------
+■リスト4-13
+------------------------------------------
+Route.post('/sample', 'SamplesController.index_posted')
+
+
+
+------------------------------------------
+■リスト4-14
+------------------------------------------
+@section('body')
+<p>{{message}}</p>
+<form method="post" action="/sample">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" 
+      id="name" name="name">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="text" class="form-control" 
+      id="email" name="email">
+  </div>
+  <div class="mb-3">
+    <label for="age" class="form-label">Age</label>
+    <input type="number" class="form-control" 
+      id="age" name="age">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form>  
+@end
+
+
+
+------------------------------------------
+■リスト4-15
+------------------------------------------
+public async index_posted(ctx: HttpContextContract) {
+  const data = {
+    title: 'Sample',
+    message: JSON.stringify(ctx.request.body())
+  }
+  return ctx.view.render('samples/index', data)
+}
+
+
+
+------------------------------------------
+■リスト4-16
+------------------------------------------
+Route.get('/sample/:id/:pass', 'SamplesController.index')
+
+
+
+------------------------------------------
+■リスト4-17
+------------------------------------------
+public async index(ctx: HttpContextContract) {
+  const msg = 'ID:' + ctx.request.param('id') 
+    + ', pass:' + ctx.request.param('pass')
+  const data = {
+    title: 'Sample',
+    message: msg
+  }
+  return ctx.view.render('samples/index', data)
+}
+
+
+
+------------------------------------------
+■リスト4-18
+------------------------------------------
+import Env from '@ioc:Adonis/Core/Env'
+import Application from '@ioc:Adonis/Core/Application'
+import { SessionConfig } from '@ioc:Adonis/Addons/Session'
+
+
+const sessionConfig: SessionConfig = {
+  enabled: true,
+  driver: Env.get('SESSION_DRIVER'),
+  cookieName: 'adonis-session',
+  clearWithBrowser: false,
+  age: '2h',
+  cookie: {
+    path: '/',
+    httpOnly: true,
+    sameSite: false,
+  },
+  file: {
+    location: Application.tmpPath('sessions'),
+  },
+  redisConnection: 'local',
+}
+
+
+export default sessionConfig
+
+
+
+------------------------------------------
+■リスト4-19
+------------------------------------------
+SESSION_DRIVER=cookie
+
+
+
+------------------------------------------
+■リスト4-20
+------------------------------------------
+public async index(ctx: HttpContextContract) {
+  var list = ctx.session.get('list')
+  if (list == undefined) {
+    list = []
+    ctx.session.put('list', list)
+  }
+  const data = {
+    title: 'Sample',
+    message: 'メッセージを送信：',
+    list: list
+  }
+  return ctx.view.render('samples/index', data)
+}
+
+
+public async index_posted(ctx: HttpContextContract) {
+  const list = ctx.session.get('list')
+  const msg = ctx.request.input('msg')
+  list.unshift(ctx.request.input('msg'))
+  ctx.session.put('list', list)
+  const data = {
+    title: 'Sample',
+    message: '「' + msg + '」を送信しました。',
+    list: list
+  }
+  return ctx.view.render('samples/index', data)
+}
+
+
+
+------------------------------------------
+■リスト4-21
+------------------------------------------
+@section('body')
+<p>{{message}}</p>
+<form method="post" action="/sample">
+  <div class="mb-3">
+    <label for="msg" class="form-label">Message</label>
+    <input type="text" class="form-control" 
+      id="msg" name="msg">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form>
+<hr>
+<h5>※セッションの内容</h5>
+<ul class="list-group">
+  @each(item in list)
+  <li class="list-group-item">{{item}}</li>
+  @end
+</ul>
+@end
+
+
+
+------------------------------------------
+■リスト4-22
+------------------------------------------
+import Env from '@ioc:Adonis/Core/Env'
+import Application from '@ioc:Adonis/Core/Application'
+import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
+
+
+const databaseConfig: DatabaseConfig = {
+  connection: Env.get('DB_CONNECTION'),
+
+
+  connections: {
+    sqlite: {
+      client: 'sqlite',
+      connection: {
+        filename: Application.tmpPath('db.sqlite3'),
+      },
+      migrations: {
+        naturalSort: true,
+      },
+      useNullAsDefault: true,
+      healthCheck: false,
+      debug: false,
+    },
+  }
+}
+
+
+export default databaseConfig
+
+
+
+------------------------------------------
+■リスト4-23
+------------------------------------------
+DB_CONNECTION=sqlite
+
+
+
+------------------------------------------
+■リスト4-24
+------------------------------------------
+import { DateTime } from 'luxon'
+import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+
+
+export default class Person extends BaseModel {
+  @column({ isPrimary: true })
+  public id: number
+
+
+  @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime
+
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updatedAt: DateTime
+}
+
+
+
+------------------------------------------
+■リスト4-25
+------------------------------------------
+export default class Person extends BaseModel {
+  @column({ isPrimary: true })
+  public id: number
+
+
+  @column()
+  public name: string
+
+
+  @column()
+  public email: string
+
+
+  @column()
+  public age: number
+
+
+   @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime
+
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updatedAt: DateTime
+}
+
+
+
+------------------------------------------
+■リスト4-26
+------------------------------------------
+import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+
+
+export default class People extends BaseSchema {
+  protected tableName = 'people'
+
+
+  public async up () {
+    this.schema.createTable(this.tableName, (table) => {
+      table.increments('id')
+      table.timestamp('created_at', { useTz: true })
+      table.timestamp('updated_at', { useTz: true })
+    })
+  }
+
+
+  public async down () {
+    this.schema.dropTable(this.tableName)
+  }
+}
+
+
+
+------------------------------------------
+■リスト4-27
+------------------------------------------
+public async up () {
+  this.schema.createTable(this.tableName, (table) => {
+    table.increments('id')
+    table.string('name')
+    table.string('email')
+    table.integer('age')
+    table.timestamp('created_at', { useTz: true })
+    table.timestamp('updated_at', { useTz: true })
+  })
+}
+
+
+
+------------------------------------------
+■リスト4-28
+------------------------------------------
+import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+
+
+export default class PersonSeeder extends BaseSeeder {
+  public async run () {
+    // Write your database queries inside the run method
+  }
+}
+
+
+
+------------------------------------------
+■リスト4-29
+------------------------------------------
+import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+import Person from 'App/Models/Person'
+
+
+export default class PersonSeeder extends BaseSeeder {
+  public async run () {
+    await Person.createMany([
+      {
+        name: 'taro',
+        email: 'taro@yamada',
+        age:39,
+      },
+      {
+        name: 'hanako',
+        email: 'hanako@flower',
+        age:28,
+      },
+      {
+        name: 'sachiko',
+        email: 'sachiko@happy',
+        age:17,
+      },
+    ])
+  }
+}
+
+
+
+------------------------------------------
+■リスト4-30
+------------------------------------------
+// import Person from 'App/Models/Person' を追加
+
+
+public async index(ctx: HttpContextContract) {
+  const people = await Person.all()
+  const data = {
+    title: 'Sample',
+    message: 'Lucid',
+    data:people
+  }
+  return ctx.view.render('samples/index', data)
+}
+
+
+
+------------------------------------------
+■リスト4-31
+------------------------------------------
+@layout('layouts/main')
+@set('title', title)
+
+
+@section('body')
+<p>{{message}}</p>
+<ul class="list-group">
+  @each(item in data)
+  <li class="list-group-item">{{JSON.stringify(item)}}</li>
+  @end
+</ul>
+@end
+
+
+
+------------------------------------------
+■リスト4-32
+------------------------------------------
+@layout('layouts/main')
+@set('title', title)
+
+
+@section('body')
+<p>{{message}}</p>
+<form method="post" action="/person/add">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" 
+      id="name" name="name">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="text" class="form-control" 
+      id="email" name="email">
+  </div>
+  <div class="mb-3">
+    <label for="age" class="form-label">Age</label>
+    <input type="number" class="form-control" 
+      id="age" name="age">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form>
+@end
+
+
+
+------------------------------------------
+■リスト4-33
+------------------------------------------
+public async add(ctx: HttpContextContract) {
+  const data = {
+    title: 'Add',
+    message: 'Personの新規作成：'
+  }
+  return ctx.view.render('people/add', data)
+}
+
+
+public async add_posted(ctx: HttpContextContract) {
+  await Person.create(ctx.request.body())
+  return ctx.response.redirect('/person')
+}
+
+
+
+------------------------------------------
+■リスト4-34
+------------------------------------------
+Route.get('/person/add', 'PeopleController.add')
+Route.post('/person/add', 'PeopleController.add_posted')
+
+
+ ------------------------------------------
+■リスト4-35
+------------------------------------------
+@layout('layouts/main')
+@set('title', title)
+
+
+@section('body')
+<p>{{message}}</p>
+<form method="post" action="/person/{{person.id}}">
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" 
+      id="name" name="name" value="{{person.name}}">
+  </div>
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input type="text" class="form-control" 
+      id="email" name="email" value="{{person.email}}">
+  </div>
+  <div class="mb-3">
+    <label for="age" class="form-label">Age</label>
+    <input type="number" class="form-control" 
+      id="age" name="age" value="{{person.age}}">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form>
+@end
+
+
+
+------------------------------------------
+■リスト4-36
+------------------------------------------
+public async edit(ctx: HttpContextContract) {
+  const id = ctx.request.param('id')
+  const person = await Person.find(id)
+  const data = {
+    title: 'Edit',
+    message: 'Person id=' + id + 'の編集',
+    person: person
+  }
+  return ctx.view.render('people/edit', data)
+}
+
+
+public async edit_posted(ctx: HttpContextContract) {
+  const id = ctx.request.param('id')
+  const person = await Person.find(id)
+  await person?.merge(ctx.request.body()).save()
+  return ctx.response.redirect('/person')
+}
+
+
+
+------------------------------------------
+■リスト4-37
+------------------------------------------
+Route.get('/person/:id', 'PeopleController.edit')
+Route.post('/person/:id', 'PeopleController.edit_posted')
+
+
+
+------------------------------------------
+■リスト4-38
+------------------------------------------
+@layout('layouts/main')
+@set('title', title)
+
+
+@section('body')
+<p>{{message}}</p>
+<form method="post" action="/person/del/{{person.id}}">
+  <pre>{{JSON.stringify(person,null,'   ')}}</pre>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form>
+@end
+
+
+
+------------------------------------------
+■リスト4-39
+------------------------------------------
+public async delete(ctx: HttpContextContract) {
+  const id = ctx.request.param('id')
+  const person = await Person.find(id)
+  const data = {
+    title: 'Delete',
+    message: 'Person id=' + id + 'を削除します。',
+    person: person
+  }
+  return ctx.view.render('people/delete', data)
+}
+
+
+public async delete_posted(ctx: HttpContextContract) {
+  const id = ctx.request.param('id')
+  const person = await Person.find(id)
+  await person?.delete()
+  return ctx.response.redirect('/person')
+}
+
+
+
+------------------------------------------
+■リスト4-40
+------------------------------------------
+Route.get('/person/del/:id', 'PeopleController.delete')
+Route.post('/person/del/:id', 'PeopleController.delete_posted')
+
+
+
+------------------------------------------
+■リスト4-41
+------------------------------------------
+@layout('layouts/main')
+@set('title', title)
+
+
+@section('body')
+<p>{{message}}</p>
+<form method="post" action="/person/find">
+  <div class="mb-3">
+    <label for="find" class="form-label">Find</label>
+    <input type="text" class="form-control" 
+      id="find" name="find" value="{{find}}">
+  </div>
+  <button type="submit" class="btn btn-secondary">送信</button>
+</form>
+<hr>
+<table class="table">
+  <thead>
+    <tr>
+      <th>id</th><th>name</th>
+      <th>email</th><th>age</th>
+      <th>created</th><th>updated</th>
+    </tr>
+  </thead>
+  @each(item in data)
+  <tr>
+    <td>{{item.id}}</td>
+    <td>{{item.name}}</td>
+    <td>{{item.email}}</td>
+    <td>{{item.age}}</td>
+    <td>{{item.createdAt.toISODate()}}</td>
+    <td>{{item.updatedAt.toISODate()}}</td>
+  </tr>
+  @end
+</table>
+@end
+
+
+
+------------------------------------------
+■リスト4-42
+------------------------------------------
+public async find(ctx: HttpContextContract) {
+  var find:string
+  var people:Person[]
+  if (ctx.request.method() == 'POST') {
+    find = ctx.request.input('find')
+    people = await Person.query()
+      .where('name','=', find)
+      .exec()
+  } else {
+    find = ''
+    people = await Person.all()
+  }
+  const data = {
+    title: 'Find',
+    message: '',
+    find: find,
+    data: people
+  }
+  return ctx.view.render('people/find', data)
+}
+
+
+
+------------------------------------------
+■リスト4-43
+------------------------------------------
+Route.any('/person/find', 'PeopleController.find')
+
+
+
+------------------------------------------
+■リスト4-44
+------------------------------------------
+people = await Person.query()
+  .where('age','<', find)
+  .exec()
+
+
+
+------------------------------------------
+■リスト4-45
+------------------------------------------
+people = await Person.query()
+  .where('name','like', '%' + find + '%')
+  .exec()
+
+
+
+------------------------------------------
+■リスト4-46
+------------------------------------------
+if (ctx.request.method() == 'POST') {
+  find = ctx.request.input('find')
+  people = await Person.query()
+    .where('name','like', '%' + find + '%')
+    .orderBy('name', 'asc')
+    .exec()
+} else {
+  find = ''
+  people = await Person.query()
+    .orderBy('age', 'desc')
+    .exec()
+}
+
+
+
+------------------------------------------
+■リスト4-47
+------------------------------------------
+public async index(ctx: HttpContextContract) {
+  const qs = ctx.request.qs()
+  var p = parseInt(qs.page ? qs.page : 1)
+  p = p < 1 ? 1 : p
+  const people = await Person.query()
+    .paginate(p, 5)
+  const data = {
+    title: 'Sample',
+    message: 'Lucid',
+    page:p,
+    data: people
+  }
+  return ctx.view.render('people/index', data)
+}
+
+
+
+------------------------------------------
+■リスト4-48
+------------------------------------------
+<div class="text-center">
+  <a href="/person?page={{page - 1}}">Prev</a>
+  ｜
+  <a href="/person?page={{page + 1}}">Next</a>
+</div>
+
+
+
+------------------------------------------
+■リスト5-1
+------------------------------------------
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+}
+bootstrap();
+
+
+
+------------------------------------------
+■リスト5-2
+------------------------------------------
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+
+------------------------------------------
+■リスト5-3
+------------------------------------------
+import { Injectable } from '@nestjs/common';
+
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-4
+------------------------------------------
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
+
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-5
+------------------------------------------
+getHello(): object {
+  return {
+    message:'Hello World!',
+    date: new Date()
+  };
+}
+
+
+
+------------------------------------------
+■リスト5-6
+------------------------------------------
+@Get()
+getHello(): object {
+  return this.appService.getHello()
+}
+
+
+
+------------------------------------------
+■リスト5-7
+------------------------------------------
+import { Injectable } from '@nestjs/common';
+
+
+const data = [
+  {name:'taro', mail:'taro@yamada', age:39},
+  {name:'hanako', mail:'hanako@flower', age:28},
+  {name:'sachiko', mail:'sachiko@happy', age:17}
+]
+
+
+@Injectable()
+export class AppService {
+  
+  getHello(id:number): object {
+    const n = id < 0 ? 0 : id >= data.length ? data.length - 1 : id;
+    return {
+      id:n,
+      data:data[n],
+      created:new Date()
+    };
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-8
+------------------------------------------
+// import { Controller, Param, Get } from '@nestjs/common' //修正する
+
+
+@Get('/hello/:id?')
+getHello(@Param() params): object {
+  const id = params.id?? 0
+  return this.appService.getHello(id)
+}
+
+
+
+------------------------------------------
+■リスト5-9
+------------------------------------------
+import { Module } from '@nestjs/common'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
+
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+
+------------------------------------------
+■リスト5-10
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※IDを送信して下さい。</p>
+    </div>
+    <div class="mb-3">
+      <label for="id" class="form-label">ID</label>
+      <input type="number" class="form-control" 
+        id="id" name="id" value="0">
+    </div>
+    <button class="btn btn-secondary" onclick="doAction();">送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doAction() {
+        const n = document.querySelector('#id').value
+        fetch('/hello/' + n)
+          .then(response => response.json())
+          .then(data => setData(data))
+      }
+
+
+      function setData(obj) {
+        const table = `<table class="table">
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Mail</th><th>Age</th><th>Created</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${obj.id}</td>
+              <td>${obj.data.name}</td>
+              <td>${obj.data.mail}</td>
+              <td>${obj.data.age}</td>
+              <td>${obj.created}</td>
+            </tr>
+          </tbody>
+        </table>`
+        document.querySelector('#result').innerHTML = table
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-11
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを送信して下さい。</p>
+    </div>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" 
+        id="name" name="name">
+    </div>
+    <div class="mb-3">
+      <label for="mail" class="form-label">Mail</label>
+      <input type="text" class="form-control" 
+        id="mail" name="mail">
+    </div>
+    <div class="mb-3">
+      <label for="age" class="form-label">Age</label>
+      <input type="number" class="form-control" 
+        id="age" name="age" value="0">
+    </div>
+    <button class="btn btn-secondary" onclick="doAction();">送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doAction() {
+        const name = document.querySelector('#name').value
+        const mail = document.querySelector('#mail').value
+        const age = document.querySelector('#age').value
+        const data = {name:name, mail:mail, age:age}
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+        fetch('/hello/post', opt)
+          .then(response => response.text())
+          .then(data => setData(data))
+      }
+
+
+      function setData(res) {
+        document.querySelector('#msg').textContent = '結果：' + res
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-12
+------------------------------------------
+export default class FormData {
+  name: string
+  mail: string
+  age: number
+}
+
+
+
+------------------------------------------
+■リスト5-13
+------------------------------------------
+import { Injectable } from '@nestjs/common'
+import FormData from './formdata'
+
+
+const data = [
+  {name:'taro', mail:'taro@yamada', age:39},
+  {name:'hanako', mail:'hanako@flower', age:28},
+  {name:'sachiko', mail:'sachiko@happy', age:17}
+]
+
+
+@Injectable()
+export class AppService {
+
+
+  getHello(id:number): object {
+    const n = id < 0 ? 0 : id >= data.length ? data.length - 1 : id;
+    return {
+      id:n,
+      data:data[n],
+      created:new Date()
+    }
+  }
+
+
+  addData(frm:FormData) {
+    data.push(frm)
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-14
+------------------------------------------
+import { Controller, Param, Body, Get, Post } from '@nestjs/common'
+import { AppService } from './app.service'
+import FormData from './formdata'
+
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+
+  @Get('/hello/:id?')
+  getHello(@Param() params): object {
+    const id = params.id?? 0
+    return this.appService.getHello(id)
+  }
+
+
+  @Post('/hello/post')
+  post(@Body() frm:FormData): string {
+    this.appService.addData(frm)
+    return 'form data was pushed!'
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-15
+------------------------------------------
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import { join } from 'path'
+const hbs = require('hbs') //☆
+
+
+async function bootstrap() {
+  const app = await NestFactory
+    .create<NestExpressApplication>(AppModule) //☆
+  app.setBaseViewsDir(join(__dirname, '..', 'views')) //☆
+  hbs.registerPartials(join(__dirname, '..', 'views', 'partials')) //☆
+  app.setViewEngine('hbs') //☆
+  await app.listen(3000)
+}
+bootstrap()
+
+
+
+------------------------------------------
+■リスト5-16
+------------------------------------------
+<h1 class="display-6 text-primary">
+  <strong>{{title}}</strong>
+</h1>
+<p>{{message}}</p>
+<hr>
+
+
+
+------------------------------------------
+■リスト5-17
+------------------------------------------
+<div class="my-3">&nbsp;</div>
+<div style="width:100%" 
+  class="fixed-bottom bg-secondary p-1">
+  <p class="text-center text-white m-0">
+    copyright 2022 SYODA-Tuyano.</p>
+</div>
+
+
+
+------------------------------------------
+■リスト5-18
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    {{>header}}
+    <p>※これがサンプルページのコンテンツです。</p>
+    {{>footer}}
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-19
+------------------------------------------
+// import { Controller, Render, Param, Body, Get, Post } from '@nestjs/common'
+
+
+@Get()
+@Render('index')
+index() {
+  return {
+    title: 'NestJS-MVC',
+    message: 'NestJS + hbs = MVC application!'
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-20
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    {{>header}}
+    <form method="post" action="/">
+      <div class="mb-3">
+        <label for="msg" class="form-label">Message</label>
+        <input type="text" class="form-control" 
+          id="msg" name="msg">
+      </div>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" 
+          id="name" name="name">
+      </div>
+      <button type="submit" class="btn btn-secondary">送信</button>
+    </form>
+    {{>footer}}
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-21
+------------------------------------------
+export default class MsgData {
+  msg: string
+  name: string
+  posted: Date
+}
+
+
+
+------------------------------------------
+■リスト5-22
+------------------------------------------
+import MsgData from './Msgdata'
+const msgs = []
+
+
+
+------------------------------------------
+■リスト5-23
+------------------------------------------
+@Get()
+@Render('index')
+index() {
+  console.log(msgs)
+  return {
+    title: 'NestJS-MVC',
+    message: 'NestJS + hbs = MVC application!',
+    data:msgs
+  }
+}
+
+
+@Post()
+@Render('index')
+form(@Body() msg:MsgData) {
+  msg.posted = new Date()
+  msgs.unshift(msg)
+  return {
+    title: 'NestJS-MVC',
+    message: 'posted: ' + JSON.stringify(msg),
+    data:msgs
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-24
+------------------------------------------
+<table class="table">
+  <thead>
+    <tr><th>Message</th><th>Name</th><th>posted</th></tr>
+  </thead>
+  <tbody>
+    {{#each data}}
+      <tr>
+        <td>{{msg}}</td>
+        <td>{{name}}</td>
+        <td>{{posted}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+
+
+------------------------------------------
+■リスト5-25
+------------------------------------------
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import * as session from 'express-session' //☆
+import { join } from 'path'
+const hbs = require('hbs')
+
+
+async function bootstrap() {
+  const app = await NestFactory
+    .create<NestExpressApplication>(AppModule)
+  app.setBaseViewsDir(join(__dirname, '..', 'views'))
+  app.setViewEngine('hbs')
+  app.use(session({ //☆
+    secret: 'sample-secret-key', //☆
+    resave: false, //☆
+    saveUninitialized: false, //☆
+  })) //☆
+  hbs.registerPartials(join(__dirname, '..', 'views', 'partials'))
+  await app.listen(3000)
+}
+bootstrap()
+
+
+
+------------------------------------------
+■リスト5-26
+------------------------------------------
+<input type="text" class="form-control" 
+  id="name" name="name" value="{{username}}">
+
+
+
+------------------------------------------
+■リスト5-27
+------------------------------------------
+import { Controller, Render, Param, Body, Get, Post, Session } from '@nestjs/common'
+
+
+
+------------------------------------------
+■リスト5-28
+------------------------------------------
+@Get()
+@Render('index')
+index(@Session() session: Record<string, any>) {
+  const username = session.username ? session.username : '（未入力）'
+  return {
+    title: 'NestJS-MVC',
+    message: 'Username: ' + username,
+    username: session.username,
+    data:msgs
+  }
+}
+
+
+@Post()
+@Render('index')
+form(@Body() msg:MsgData, @Session() session: Record<string, any>) {
+  msg.posted = new Date()
+  session.username = msg.name
+  msgs.unshift(msg)
+  return {
+    title: 'NestJS-MVC',
+    message: 'posted:' + JSON.stringify(msg),
+    username: session.username,
+    data:msgs
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-29
+------------------------------------------
+{
+  "type": "sqlite",
+  "database": "database/db.sqlite3",
+  "entities": [
+    "dist/entities/**/*.entity.js"
+  ],
+  "migrations": [
+    "dist/migrations/**/*.js"
+  ]
+}
+
+
+
+------------------------------------------
+■リスト5-30
+------------------------------------------
+import { Entity, Column, PrimaryGeneratedColumn, 
+  CreateDateColumn, UpdateDateColumn } from 'typeorm'
+
+
+@Entity()
+export class Sampledata {
+  @PrimaryGeneratedColumn()
+  id: number
+
+
+  @Column({ length: 255 })
+  memo: string
+
+
+  @Column({ length: 10000, nullable:true })
+  mail: string
+
+
+  @Column({ length: 200, nullable:true })
+  url: string
+
+
+  @CreateDateColumn()
+  created: Date
+
+
+  @UpdateDateColumn()
+  updated: Date
+}
+
+
+
+------------------------------------------
+■リスト5-31
+------------------------------------------
+import { Module } from '@nestjs/common'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
+import { TypeOrmModule } from '@nestjs/typeorm' //☆
+import { SampledataModule } from './sampledata/sampledata.module' //☆
+
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+    TypeOrmModule.forRoot(), //☆
+    SampledataModule, //☆
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+
+------------------------------------------
+■リスト5-32
+------------------------------------------
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { SampledataService } from './sampledata.service'
+import { SampledataController } from './sampledata.controller'
+import { Sampledata } from 'src/entities/sampledata.entity'
+
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Sampledata])],
+  providers: [SampledataService],
+  controllers: [SampledataController]
+})
+export class SampledataModule {}
+
+
+
+------------------------------------------
+■リスト5-33
+------------------------------------------
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { Sampledata } from 'src/entities/sampledata.entity'
+
+
+@Injectable()
+export class SampledataService {
+  constructor(
+    @InjectRepository(Sampledata)
+    private readonly sampledataRepository: Repository<Sampledata> 
+  ) {}
+
+
+  async getAll():Promise<Sampledata[]> {
+    return await this.sampledataRepository.find()
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-34
+------------------------------------------
+import { Controller, Get } from '@nestjs/common';
+import { SampledataService } from './sampledata.service';
+
+
+@Controller('sampledata')
+export class SampledataController {
+  constructor(private readonly sampledataService: SampledataService) {}
+    
+  @Get('/')
+  root():Promise<Sampledata[]> {
+    return this.sampledataService.getAll()
+  }
+
+
+}
+
+
+
+------------------------------------------
+■リスト5-35
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2" onload="getData()">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを送信します。</p>
+    </div>    
+    <table class="table">
+      <thead>
+        <tr><th>Memo</th><th>Created</th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function getData() {
+        fetch('/sampledata')
+          .then(response => response.json())
+          .then(data => makeTable(data))
+      }
+
+
+      function makeTable(data) {
+        var result = ''
+        for (var item of data) {
+          result += `<tr><td>${item.memo}</td><td>${item.created}</td></tr>`
+        }
+        document.querySelector('#tbody').innerHTML = result
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-36
+------------------------------------------
+// import { InsertResult, Repository } from 'typeorm' // 修正
+
+
+async addSampledata(obj): Promise<InsertResult> {
+  return this.sampledataRepository.insert(obj)
+}
+
+
+
+------------------------------------------
+■リスト5-37
+------------------------------------------
+// import { InsertResult, UpdateResult, DeleteResult } from 'typeorm' // 追記
+
+
+@Post('/add')
+async add(@Body() data: Sampledata):Promise<InsertResult> {
+  return  this.sampledataService.addSampledata(data)
+}
+
+
+
+------------------------------------------
+■リスト5-38
+------------------------------------------
+<div class="mb-3">
+  <label for="name" class="form-label">Memo</label>
+  <textarea class="form-control" 
+    id="memo" name="memo"></textarea>
+</div>
+<div class="mb-3">
+  <label for="mail" class="form-label">Mail</label>
+  <input type="email" class="form-control" 
+    id="mail" name="mail">
+</div>
+<div class="mb-3">
+  <label for="url" class="form-label">Url</label>
+  <input type="url" class="form-control" 
+    id="url" name="url">
+</div>
+<button class="btn btn-secondary" onclick="doAction();">送信</button>
+
+
+
+------------------------------------------
+■リスト5-39
+------------------------------------------
+function doAction() {
+  const memo = document.querySelector('#memo').value
+  const mail = document.querySelector('#mail').value
+  const url = document.querySelector('#url').value
+  const data = {memo:memo, mail:mail, url:url}
+  const opt = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  }
+  fetch('/sampledata/add', opt)
+    .then(response => response.text())
+    .then(data => setData(data))
+}
+
+
+function setData(res) {
+  document.querySelector('#msg').textContent = '結果：' + res
+  document.querySelector('#memo').value = ''
+  document.querySelector('#mail').value = ''
+  document.querySelector('#url').value = ''
+  getData()
+}
+
+
+
+------------------------------------------
+■リスト5-40
+------------------------------------------
+async getById(id:number):Promise<Sampledata> {
+  return await this.sampledataRepository.findOne(id)
+}
+
+
+async update(data:Sampledata):Promise<Sampledata> {
+  const entity = await this.getById(data.id)
+  entity.memo = data.memo
+  entity.mail = data.mail
+  entity.url = data.url
+  return await this.sampledataRepository.save(entity)
+}
+
+
+
+------------------------------------------
+■リスト5-41
+------------------------------------------
+@Post('/id')
+async byId(@Body() data: any):Promise<Sampledata> {
+  return this.sampledataService.getById(data.id)
+}
+
+
+@Post('/edit')
+async edit(@Body() data: Sampledata):Promise<Sampledata> {
+  return this.sampledataService.update(data)
+}
+
+
+
+------------------------------------------
+■リスト5-42
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを更新します。</p>
+    </div>
+    <div class="mb-3">
+      <label for="id" class="form-label">ID</label>
+      <input type="number" class="form-control" 
+        id="id" name="id" onchange="doChange()">
+    </div>
+    <hr>
+    <div class="mb-3">
+      <label for="name" class="form-label">Memo</label>
+      <textarea class="form-control" 
+        id="memo" name="memo"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="mail" class="form-label">Mail</label>
+      <input type="email" class="form-control" 
+        id="mail" name="mail">
+    </div>
+    <div class="mb-3">
+      <label for="url" class="form-label">Url</label>
+      <input type="url" class="form-control" 
+        id="url" name="url">
+    </div>
+    <button class="btn btn-secondary" id="sendbtn"
+      onclick="doAction();" disabled>送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doChange() {
+        const id = document.querySelector('#id').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id:+id})
+        }
+        fetch('/sampledata/id', opt)
+          .then(response => response.json())
+          .then(data => showData(data))
+          .catch(error => clearData() )
+      }
+
+
+      function showData(data) {
+        document.querySelector('#msg').textContent = 'id=' + id + ' のデータ。'
+        document.querySelector('#memo').value = data.memo
+        document.querySelector('#mail').value = data.mail
+        document.querySelector('#url').value = data.url
+        document.querySelector('#sendbtn').disabled = false
+      }
+      function clearData() {
+        document.querySelector('#msg').textContent = '※データを更新します。'
+        document.querySelector('#memo').value = ''
+        document.querySelector('#mail').value = ''
+        document.querySelector('#url').value = ''
+        document.querySelector('#sendbtn').disabled = true
+      }
+
+
+      function doAction() {
+        const id = document.querySelector('#id').value
+        const memo = document.querySelector('#memo').value
+        const mail = document.querySelector('#mail').value
+        const url = document.querySelector('#url').value
+        const data = {id:id, memo:memo, mail:mail, url:url}
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+        fetch('/sampledata/edit', opt)
+          .then(response => response.text())
+          .then(data => setData(data))
+      }
+
+
+      function setData(res) {
+        document.querySelector('#msg').textContent = '結果：' + res
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-43
+------------------------------------------
+async delete(data:any):Promise<DeleteResult> {
+  return await this.sampledataRepository.delete(data.id)
+}
+
+
+
+------------------------------------------
+■リスト5-44
+------------------------------------------
+@Post('/delete')
+async delete(@Body() data: any):Promise<DeleteResult> {
+  return this.sampledataService.delete(data)
+}
+
+
+ ------------------------------------------
+■リスト5-45
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを削除します。</p>
+    </div>
+    <div class="mb-3">
+      <label for="id" class="form-label">ID</label>
+      <input type="number" class="form-control" 
+        id="id" name="id" onchange="doChange()">
+    </div>
+    <button class="btn btn-secondary" id="sendbtn"
+      onclick="doAction();" disabled>送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doChange() {
+        const id = document.querySelector('#id').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id:+id})
+        }
+        fetch('/sampledata/id', opt)
+          .then(response => response.json())
+          .then(data => showData(data))
+          .catch(error => clearData() )
+      }
+
+
+      function showData(data) {
+        document.querySelector('#msg').innerHTML = '<h6>このデータを削除します。</h6>'
+          + '<div>' + JSON.stringify(data) + '</div>'
+        document.querySelector('#sendbtn').disabled = false
+      }
+      function clearData() {
+        document.querySelector('#msg').textContent = '※データを削除します。'
+        document.querySelector('#sendbtn').disabled = true
+      }
+
+
+      function doAction() {
+        const id = document.querySelector('#id').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id:id})
+        }
+        fetch('/sampledata/delete', opt)
+          .then(response => response.text())
+          .then(data => setData(data))
+      }
+
+
+      function setData(res) {
+        document.querySelector('#msg').textContent = '結果：' + res
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-46
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2" onload="getData()">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを検索します。</p>
+    </div>
+    <div class="mb-3">
+      <label for="find" class="form-label">Find</label>
+      <input type="text" class="form-control" 
+        id="find" name="find">
+    </div>
+    <button class="btn btn-secondary" onclick="doAction();">送信</button>
+    <hr>
+    <table class="table">
+      <thead>
+        <tr><th>Memo</th><th>Created</th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doAction() {
+        const find = document.querySelector('#find').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({find:find})
+        }
+        fetch('/sampledata/find', opt)
+          .then(response => response.json())
+          .then(data => makeTable(data))
+      }
+      function makeTable(data) {
+        var result = ''
+        for (var item of data) {
+          result += `<tr><td>${item.memo}</td><td>${item.created}</td></tr>`
+        }
+        document.querySelector('#tbody').innerHTML = result
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-47
+------------------------------------------
+@Post('/find')
+async find(@Body() data: any):Promise<Sampledata[]> {
+  return this.sampledataService.find(data)
+}
+
+
+
+------------------------------------------
+■リスト5-48
+------------------------------------------
+async find(data:any):Promise<Sampledata[]> {
+  return await this.sampledataRepository.find({mail:data.find})
+}
+
+
+
+------------------------------------------
+■リスト5-49
+------------------------------------------
+async find(data:any):Promise<Sampledata[]> {
+  return await this.sampledataRepository.find({memo:Like(`%${data.find}%`)})
+}
+
+
+
+------------------------------------------
+■リスト5-50
+------------------------------------------
+async getAll():Promise<Sampledata[]> {
+  return await this.sampledataRepository.find({
+    order:{created:'DESC'}
+  })
+}
+
+
+
+------------------------------------------
+■リスト6-1
+------------------------------------------
+import { Meteor } from "meteor/meteor";
+import { onPageLoad } from "meteor/server-render";
+
+
+Meteor.startup(() => {
+  console.log(`Greetings from ${module.id}!`);
+});
+
+
+onPageLoad(sink => {
+  sink.renderIntoElementById(
+    "server-render-target",
+    `Server time: ${new Date}`
+  );
+});
+
+
+
+------------------------------------------
+■リスト6-2
+------------------------------------------
+console.log(`Greetings from ${module.id}!`);
+
+
+
+------------------------------------------
+■リスト6-3
+------------------------------------------
+<head>
+  <title>Minimal Meteor app</title>
+</head>
+
+
+<body>
+  <h1>Minimal Meteor app</h1>
+  <p>
+    This Meteor app uses as few Meteor packages as possible, to keep the
+    client JavaScript bundle as small as possible.
+  </p>
+
+
+  <em id="server-render-target"></em>
+
+
+  <h2>Learn Meteor!</h2>
+  <ul>
+    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
+    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
+    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
+    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
+  </ul>
+</body>
+
+
+
+------------------------------------------
+■リスト6-4
+------------------------------------------
+<head>
+  <title>Meteor app</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1 id="title" class="display-4 my-3 text-primary"></h1>
+    <p id="content"></p>
+  </div>
+</body>
+
+
+
+------------------------------------------
+■リスト6-5
+------------------------------------------
+onPageLoad(sink => {
+  sink.renderIntoElementById('title', 'Meteor')
+  sink.renderIntoElementById('content',
+    'これは、Meteorミニマルアプリケーションのページです。')
+})
+
+
+
+------------------------------------------
+■リスト6-6
+------------------------------------------
+import { Meteor } from "meteor/meteor"
+import { onPageLoad } from "meteor/server-render"
+
+
+Meteor.startup(() => {});
+onPageLoad(sink => {})
+
+
+
+------------------------------------------
+■リスト6-7
+------------------------------------------
+<head>
+  <title>Meteor app</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1 class="display-4 my-3 text-primary">Index</h1>
+    <h6 class="p-3 border border-primary">This is main.html.</h6>
+  </div>
+</body>
+
+
+
+------------------------------------------
+■リスト6-8
+------------------------------------------
+import './main.html'
+
+
+
+------------------------------------------
+■リスト6-9
+------------------------------------------
+<head>
+  <title>Meteor app</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+  {{> index}}
+</body>
+
+
+<template name="index">
+  <h1 class="display-4 my-3 text-warning">index</h1>
+  <h5 class="alert alert-warning">This is Index-template.</h5>
+</template>
+
+
+
+------------------------------------------
+■リスト6-10
+------------------------------------------
+<body class="container">
+  {{> Template.dynamic template='index'}}
+</body>
+
+
+<template name="index">
+  <h1 class="display-4 my-3 text-warning">Index</h1>
+  <h5 class="alert alert-warning">これは、indexテンプレートです。</h5>
+</template>
+
+
+
+------------------------------------------
+■リスト6-11
+------------------------------------------
+<body class="container">
+  {{> Template.dynamic template=template data=data}}
+</body>
+
+
+<template name="index">
+  <h1 class="display-4 my-3 text-warning">{{title}}</h1>
+  <h5 class="alert alert-warning">{{message}}</h5>
+</template>
+
+
+
+------------------------------------------
+■リスト6-12
+------------------------------------------
+import { BlazeLayout } from 'meteor/kadira:blaze-layout'
+
+
+import './main.html'
+
+
+const data = {
+  title: 'index',
+  message: 'This is Index-template.'
+}
+BlazeLayout.render('index', data)
+
+
+
+------------------------------------------
+■リスト6-13
+------------------------------------------
+<template name="error">
+  <h1 class="display-4 my-3 text-danger">ERROR!</h1>
+  <h5 class="alert alert-danger">404. ページがありません。</h5>
+</template>
+
+
+
+------------------------------------------
+■リスト6-14
+------------------------------------------
+import { FlowRouter } from 'meteor/ostrio:flow-router-extra'
+import { BlazeLayout } from 'meteor/kadira:blaze-layout'
+
+
+import './main.html'
+
+
+FlowRouter.route('/', {
+  action(params, queryParams) {
+    const data = {
+      title: 'index',
+      message: 'This is Index-template.'
+    }
+    this.render('index', data)
+  }
+})
+
+
+// ☆その他のパスのエラー処理
+FlowRouter.route('/*', {
+  action(params, queryParams) {
+    this.render('error')
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-15
+------------------------------------------
+<template name="hello">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">{{hello}}</h5>
+</template>
+
+
+
+------------------------------------------
+■リスト6-16
+------------------------------------------
+FlowRouter.route('/hello', {
+  action(params, queryParams) {
+    const data = {
+      title: 'Hello',
+    }
+    this.render('hello', data)
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-17
+------------------------------------------
+// import { Template } from 'meteor/templating' を追記
+
+
+Template.hello.helpers({
+  hello() {
+    return new Date().toLocaleString()
+  },
+})
+
+
+
+------------------------------------------
+■リスト6-18
+------------------------------------------
+Template.hello.onCreated(function() {
+  this.msg = 'これはonCreateで初期化したメッセージです。'
+})
+
+
+Template.hello.helpers({
+  hello() {
+    return Template.instance().msg
+  },
+})
+
+
+ ------------------------------------------
+■リスト6-19
+------------------------------------------
+<template name="hello">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">Count: {{count}}</h5>
+</template>
+
+
+
+------------------------------------------
+■リスト6-20
+------------------------------------------
+Template.hello.onCreated(function() {
+  this.count = 0
+  setInterval(()=>{
+    this.count += 1
+  },1000)
+})
+
+
+Template.hello.helpers({
+  count() {
+    return Template.instance().count
+  },
+})
+
+
+
+------------------------------------------
+■リスト6-21
+------------------------------------------
+// import { ReactiveVar } from 'meteor/reactive-var' を追記
+
+
+Template.hello.onCreated(function() {
+  this.count = new ReactiveVar(0)
+  setInterval(()=>{
+    this.count.set(this.count.get() + 1)
+  },1000)
+})
+
+
+Template.hello.helpers({
+  count() {
+    return Template.instance().count.get()
+  },
+})
+
+
+
+------------------------------------------
+■リスト6-22
+------------------------------------------
+<template name="hello">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">Count: {{count}}</h5>
+  <button id="btn1" class="btn btn-primary">Click!</button>
+</template>
+
+
+
+------------------------------------------
+■リスト6-23
+------------------------------------------
+Template.hello.onCreated(function() {
+  this.count = new ReactiveVar(0)
+})
+
+
+Template.hello.events({
+  'click button[id="btn1"]'(event, instance) {
+    instance.count.set(instance.count.get() + 1)
+  },
+})
+
+
+
+------------------------------------------
+■リスト6-24
+------------------------------------------
+<template name="hello">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">{{msg}}</h5>
+  <label for="num" class="form-label">Number:</label>
+  <input type="number" id="num" class="form-control">
+</template>
+
+
+
+------------------------------------------
+■リスト6-25
+------------------------------------------
+Template.hello.onCreated(function() {
+  this.inputed = new ReactiveVar(0)
+})
+
+
+Template.hello.helpers({
+  msg() {
+    var total = 0
+    var max = Template.instance().inputed.get()
+    if (!max) {
+      return "input number..."
+    }
+    for (var i= 0;i <= max;i++) {
+      total += i
+    }
+    return  "TOTAL: " + total + " !"
+  },
+})
+
+
+Template.hello.events({
+  'change input[type=number]'(event, instance) {
+    instance.inputed.set(event.target.value)
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-26
+------------------------------------------
+import { Mongo } from 'meteor/mongo'
+
+
+export const People = new Mongo.Collection('people')
+
+
+
+------------------------------------------
+■リスト6-27
+------------------------------------------
+// import { People } from "../imports/people" // 追記
+
+
+Meteor.startup(() => {
+  People.insert({name:'taro', email:'taro@yamada'}) //☆
+  People.insert({name:'hanako', email:'hanako@flower'}) //☆
+  const data = People.find().fetch()
+  console.log(data)
+})
+
+
+
+------------------------------------------
+■リスト6-28
+------------------------------------------
+<template name="people">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">{{message}}</h5>
+  <h5 class="mt-4">People data</h5>
+  <pre class="border border-1">
+  {{data}}
+  </pre>
+</template>
+
+
+
+------------------------------------------
+■リスト6-29
+------------------------------------------
+// import { People } from "../imports/people" //追記
+
+
+FlowRouter.route('/people', {
+  action(params, queryParams) {
+    const result = People.find().fetch()
+    const data = {
+      title: 'People',
+      message: 'Show people data.',
+      data:JSON.stringify(result, null, '  ')
+    }
+    this.render('people', data)
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-30
+------------------------------------------
+Meteor.methods({
+  getAll() {
+    return People.find().fetch()
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-31
+------------------------------------------
+FlowRouter.route('/people', {
+  action(params, queryParams) {
+    const data = {
+      title: 'People',
+      message: 'Show people data.'
+    }
+    this.render('people', data)
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-32
+------------------------------------------
+Template.people.onCreated(function() {
+  this.people = new ReactiveVar([])
+  Meteor.call('getAll', (error, result)=> {
+    this.people.set(result)
+  })
+})
+
+
+
+------------------------------------------
+■リスト6-33
+------------------------------------------
+Template.people.helpers({
+  data() {
+    const result = Template.instance().people.get()
+    return JSON.stringify(result, null, '  ')
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-34
+------------------------------------------
+Template.people.helpers({
+  data() {
+    return Template.instance().people.get()
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-35
+------------------------------------------
+<template name="people">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">{{message}}</h5>
+  <h5 class="mt-4">People data</h5>
+  <ul class="list-group">
+  {{#each data}}
+    <li class="list-group-item">{{this.name}} ({{this.email}})</li>
+  {{/each}}
+  </ul>
+</template>
+
+
+
+------------------------------------------
+■リスト6-36
+------------------------------------------
+Meteor.methods({
+  getAll() {
+    return People.find().fetch()
+  },
+  insert(obj) {
+    People.insert(obj)
+  },
+})
+
+
+
+------------------------------------------
+■リスト6-37
+------------------------------------------
+<template name="add">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">{{msg}}</h5>
+  <div class="my-2">
+    <label for="name" class="form-label">Name:</label>
+    <input type="text" id="name" class="form-control">
+  </div>
+  <div class="my-2">
+    <label for="email" class="form-label">Email:</label>
+    <input type="email" id="email" class="form-control">
+  </div>
+  <div class="my-2">
+    <button class="btn btn-primary" id="action">Click</button>
+  </div>
+</template>
+
+
+
+------------------------------------------
+■リスト6-38
+------------------------------------------
+FlowRouter.route('/people/add', {
+  action(params, queryParams) {
+    const data = {
+      title: 'People',
+    }
+    this.render('add', data)
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-39
+------------------------------------------
+Template.add.onCreated(function() {
+  this.name = new ReactiveVar('')
+  this.email = new ReactiveVar('')
+  this.msg = new ReactiveVar('create people:')
+})
+
+
+Template.add.helpers({
+  msg() {
+    return Template.instance().msg.get()
+  }
+})
+
+
+Template.add.events({
+  'change input[id="name"]'(event, instance) {
+    instance.name.set(event.target.value)
+  },
+  'change input[id="email"]'(event, instance) {
+    instance.email.set(event.target.value)
+  },
+  'click button[id="action"]'(event, instance) {
+    const obj = {
+      name:instance.name.get(),
+      email:instance.email.get()
+    }
+    Meteor.call('insert', obj, (error,result)=> {
+      instance.msg.set('Created!!')
+    })
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-40
+------------------------------------------
+getByName(str) {
+  return People.findOne({name:str})
+},
+update(obj) {
+  People.update({name:obj.name},obj)
+},
+
+
+
+------------------------------------------
+■リスト6-41
+------------------------------------------
+<template name="edit">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">{{msg}}</h5>
+  <div class="my-2">
+    <label for="name" class="form-label">Name:</label>
+    <input type="text" id="name" class="form-control"
+      value="{{target.name}}" disabled>
+  </div>
+  <div class="my-2">
+    <label for="email" class="form-label">Email:</label>
+    <input type="email" id="email" class="form-control"
+      value="{{target.email}}">
+  </div>
+  <div class="my-2">
+    <button class="btn btn-primary" id="action">Click</button>
+  </div>
+</template>
+
+
+
+------------------------------------------
+■リスト6-42
+------------------------------------------
+FlowRouter.route('/people/edit/:name', {
+  action(params, queryParams) {
+    Meteor.call('getByName', params.name, (error, result)=> {
+      const data = {
+        title: 'People',
+        message:'edit people document:',
+        target:result
+      }
+      this.render('edit', data)
+    })
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-43
+------------------------------------------
+Template.edit.onCreated(function() {
+  this.target = this.data.target
+  this.email = new ReactiveVar('')
+  this.msg = new ReactiveVar('edit people:')
+})
+
+
+Template.edit.helpers({
+  msg() {
+    return Template.instance().msg.get()
+  }
+})
+
+
+Template.edit.events({
+  'change input[id="email"]'(event, instance) {
+    instance.email.set(event.target.value)
+  },
+  'click button[id="action"]'(event, instance) {
+    const target = instance.target
+    target.email = instance.email.get()
+    Meteor.call('update', target, (error)=> {
+      instance.msg.set('Update document.')
+    })
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-44
+------------------------------------------
+delete(id) {
+  People.remove({_id:id})
+},
+
+
+
+------------------------------------------
+■リスト6-45
+------------------------------------------
+<template name="delete">
+  <h1 class="display-4 my-3 text-primary">{{title}}</h1>
+  <h5 class="alert alert-primary">{{msg}}</h5>
+  <div class="my-2">
+    <label for="name" class="form-label">Document:</label>
+    <input type="text" id="name" class="form-control"
+      value="{{target.name}}[{{target.email}}]" disabled>
+  </div>
+  <div class="my-2">
+    <button class="btn btn-primary" id="action">Click</button>
+  </div>
+</template>
+<template name="hello">
+</template>
+
+
+
+------------------------------------------
+■リスト6-46
+------------------------------------------
+FlowRouter.route('/people/delete/:name', {
+  action(params, queryParams) {
+    Meteor.call('getByName', params.name, (error, result)=> {
+      const data = {
+        title: 'People',
+        target:result
+      }
+      this.render('delete', data)
+    })
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-47
+------------------------------------------
+Template.delete.onCreated(function() {
+  this.target = this.data.target._id
+  this.msg = new ReactiveVar('delete people:')
+})
+
+
+Template.delete.helpers({
+  msg() {
+    return Template.instance().msg.get()
+  }
+})
+
+
+Template.delete.events({
+  'click button[id="action"]'(event, instance) {
+    Meteor.call('delete', instance.target, (error)=> {
+      instance.msg.set('Delete document...')
+    })
+  }
+})
+
+
+
+------------------------------------------
+■リスト6-48
+------------------------------------------
+import { Mongo } from 'meteor/mongo';
+
+
+export const LinksCollection = new Mongo.Collection('links');
+
+
+
+------------------------------------------
+■リスト6-49
+------------------------------------------
+import { Meteor } from 'meteor/meteor';
+import { LinksCollection } from '/imports/api/links';
+
+
+function insertLink({ title, url }) {
+  LinksCollection.insert({title, url, createdAt: new Date()});
+}
+
+
+Meteor.startup(() => {
+  if (LinksCollection.find().count() === 0) {
+    insertLink({
+      title: 'Do the Tutorial',
+      url: 'https://www.meteor.com/tutorials/react/creating-an-app'
+    });
+
+
+    ……以下、必要なだけinsertLinkが並ぶ……
+
+
+  }
+});
+
+
+
+------------------------------------------
+■リスト6-50
+------------------------------------------
+<head>
+  <title>meteor_react_app</title>
+</head>
+
+
+<body>
+  <div id="react-target"></div>
+</body>
+
+
+
+------------------------------------------
+■リスト6-51
+------------------------------------------
+import React from 'react';
+import { Meteor } from 'meteor/meteor';
+import { render } from 'react-dom';
+import { App } from '/imports/ui/App';
+
+
+Meteor.startup(() => {
+  render(<App/>, document.getElementById('react-target'));
+});
+
+
+
+------------------------------------------
+■リスト6-52――App.jsx
+------------------------------------------
+import React from 'react';
+import { Hello } from './Hello.jsx';
+import { Info } from './Info.jsx';
+
+
+export const App = () => (
+  <div>
+    <h1>Welcome to Meteor!</h1>
+    <Hello/>
+    <Info/>
+  </div>
+);
+
+
+
+------------------------------------------
+■リスト6-53――Hello.jsx
+------------------------------------------
+import React, { useState } from 'react';
+
+
+export const Hello = () => {
+  const [counter, setCounter] = useState(0);
+
+
+  const increment = () => {
+    setCounter(counter + 1);
+  };
+
+
+  return (
+    <div>
+      <button onClick={increment}>Click Me</button>
+      <p>You've pressed the button {counter} times.</p>
+    </div>
+  );
+};
+
+
+
+------------------------------------------
+■リスト6-54――Info.jsx
+------------------------------------------
+import React from 'react';
+import { useTracker } from 'meteor/react-meteor-data';
+import { LinksCollection } from '../api/links';
+
+
+export const Info = () => {
+  const links = useTracker(() => {
+    return LinksCollection.find().fetch();
+  });
+
+
+  return (
+    <div>
+      <h2>Learn Meteor!</h2>
+      <ul>{links.map(
+        link => <li key={link._id}>
+          <a href={link.url} target="_blank">{link.title}</a>
+        </li>
+      )}</ul>
+    </div>
+  );
+};
+
+
+
+------------------------------------------
+■リスト6-55
+------------------------------------------
+<head>
+  <title>meteor_react_app</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+
+
+------------------------------------------
+■リスト6-56
+------------------------------------------
+import React, { useState } from 'react'
+
+
+export const Hello = () => {
+  const [input, setInput] = useState('')
+  const [msg, setMsg] = useState('お名前をどうぞ。')
+
+
+  const doChange = (event) => {
+    setInput(event.target.value)
+  }
+
+
+  const doAction = () => {
+    setMsg('こんにちは、' + input + 'さん！')
+  }
+
+
+  return (
+    <div className="my-3">
+      <p>{msg}</p>
+      <input type="text" className="form-control"
+        onChange={doChange} />
+      <button className="btn btn-primary my-2" 
+        onClick={doAction}>Click!</button>
+    </div>
+  )
+}
+
+
+
+------------------------------------------
+■リスト6-57
+------------------------------------------
+import React, { useState } from 'react'
+import { LinksCollection } from '../api/links'
+
+
+export const Hello = () => {
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
+  const [msg, setMsg] = useState('リンク情報を入力：')
+
+
+  const doChangeTitle = (event) => {
+    setTitle(event.target.value)
+  }
+  const doChangeUrl = (event) => {
+    setUrl(event.target.value)
+  }
+
+
+  const doAction = () => {
+    const obj = {
+      title: title, url:url
+    }
+    LinksCollection.insert(obj)
+    setMsg('ドキュメントを追加しました。')
+  }
+
+
+  return (
+    <div className="my-3">
+      <p>{msg}</p>
+      <div className="my-2">
+        <label>Title</label>
+        <input type="text" className="form-control"
+          onChange={doChangeTitle} />
+      </div>
+      <div className="my-2">
+      <label>URL</label>
+      <input type="url" className="form-control"
+        onChange={doChangeUrl} />
+      </div>
+      <button className="btn btn-primary my-2" 
+        onClick={doAction}>Click!</button>
+    </div>
+  )
+}
+
+
+
+------------------------------------------
+■リスト6-58
+------------------------------------------
+import React from 'react';
+import { useTracker } from 'meteor/react-meteor-data'
+import { LinksCollection } from '../api/links'
+
+
+export const Info = () => {
+  const links = useTracker(() => {
+    return LinksCollection.find().fetch();
+  })
+
+
+  return (
+    <div>
+      <h2>Learn Meteor!</h2>
+      <table className="table">
+        <thead><tr>
+          <th>Title</th>
+          <th>Url</th>
+        </tr></thead>
+        <tbody>
+        {links.map(
+          link => <tr key={link._id}>
+            <td>{link.title}</td>
+            <td><a href={link.url}>{link.url}</a></td>
+          </tr>
+        )}
+      </tbody></table>
+    </div>
+  )
+}

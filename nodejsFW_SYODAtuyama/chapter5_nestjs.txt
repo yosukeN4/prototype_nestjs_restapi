@@ -1,0 +1,1215 @@
+------------------------------------------
+■リスト5-1
+------------------------------------------
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
+}
+bootstrap();
+
+
+
+------------------------------------------
+■リスト5-2
+------------------------------------------
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
+
+@Module({
+  imports: [],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+
+------------------------------------------
+■リスト5-3
+------------------------------------------
+import { Injectable } from '@nestjs/common';
+
+
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-4
+------------------------------------------
+import { Controller, Get } from '@nestjs/common';
+import { AppService } from './app.service';
+
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-5
+------------------------------------------
+getHello(): object {
+  return {
+    message:'Hello World!',
+    date: new Date()
+  };
+}
+
+
+
+------------------------------------------
+■リスト5-6
+------------------------------------------
+@Get()
+getHello(): object {
+  return this.appService.getHello()
+}
+
+
+
+------------------------------------------
+■リスト5-7
+------------------------------------------
+import { Injectable } from '@nestjs/common';
+
+
+const data = [
+  {name:'taro', mail:'taro@yamada', age:39},
+  {name:'hanako', mail:'hanako@flower', age:28},
+  {name:'sachiko', mail:'sachiko@happy', age:17}
+]
+
+
+@Injectable()
+export class AppService {
+  
+  getHello(id:number): object {
+    const n = id < 0 ? 0 : id >= data.length ? data.length - 1 : id;
+    return {
+      id:n,
+      data:data[n],
+      created:new Date()
+    };
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-8
+------------------------------------------
+// import { Controller, Param, Get } from '@nestjs/common' //修正する
+
+
+@Get('/hello/:id?')
+getHello(@Param() params): object {
+  const id = params.id?? 0
+  return this.appService.getHello(id)
+}
+
+
+
+------------------------------------------
+■リスト5-9
+------------------------------------------
+import { Module } from '@nestjs/common'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
+
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+
+------------------------------------------
+■リスト5-10
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※IDを送信して下さい。</p>
+    </div>
+    <div class="mb-3">
+      <label for="id" class="form-label">ID</label>
+      <input type="number" class="form-control" 
+        id="id" name="id" value="0">
+    </div>
+    <button class="btn btn-secondary" onclick="doAction();">送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doAction() {
+        const n = document.querySelector('#id').value
+        fetch('/hello/' + n)
+          .then(response => response.json())
+          .then(data => setData(data))
+      }
+
+
+      function setData(obj) {
+        const table = `<table class="table">
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Mail</th><th>Age</th><th>Created</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${obj.id}</td>
+              <td>${obj.data.name}</td>
+              <td>${obj.data.mail}</td>
+              <td>${obj.data.age}</td>
+              <td>${obj.created}</td>
+            </tr>
+          </tbody>
+        </table>`
+        document.querySelector('#result').innerHTML = table
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-11
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを送信して下さい。</p>
+    </div>
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" 
+        id="name" name="name">
+    </div>
+    <div class="mb-3">
+      <label for="mail" class="form-label">Mail</label>
+      <input type="text" class="form-control" 
+        id="mail" name="mail">
+    </div>
+    <div class="mb-3">
+      <label for="age" class="form-label">Age</label>
+      <input type="number" class="form-control" 
+        id="age" name="age" value="0">
+    </div>
+    <button class="btn btn-secondary" onclick="doAction();">送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doAction() {
+        const name = document.querySelector('#name').value
+        const mail = document.querySelector('#mail').value
+        const age = document.querySelector('#age').value
+        const data = {name:name, mail:mail, age:age}
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+        fetch('/hello/post', opt)
+          .then(response => response.text())
+          .then(data => setData(data))
+      }
+
+
+      function setData(res) {
+        document.querySelector('#msg').textContent = '結果：' + res
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-12
+------------------------------------------
+export default class FormData {
+  name: string
+  mail: string
+  age: number
+}
+
+
+
+------------------------------------------
+■リスト5-13
+------------------------------------------
+import { Injectable } from '@nestjs/common'
+import FormData from './formdata'
+
+
+const data = [
+  {name:'taro', mail:'taro@yamada', age:39},
+  {name:'hanako', mail:'hanako@flower', age:28},
+  {name:'sachiko', mail:'sachiko@happy', age:17}
+]
+
+
+@Injectable()
+export class AppService {
+
+
+  getHello(id:number): object {
+    const n = id < 0 ? 0 : id >= data.length ? data.length - 1 : id;
+    return {
+      id:n,
+      data:data[n],
+      created:new Date()
+    }
+  }
+
+
+  addData(frm:FormData) {
+    data.push(frm)
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-14
+------------------------------------------
+import { Controller, Param, Body, Get, Post } from '@nestjs/common'
+import { AppService } from './app.service'
+import FormData from './formdata'
+
+
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+
+  @Get('/hello/:id?')
+  getHello(@Param() params): object {
+    const id = params.id?? 0
+    return this.appService.getHello(id)
+  }
+
+
+  @Post('/hello/post')
+  post(@Body() frm:FormData): string {
+    this.appService.addData(frm)
+    return 'form data was pushed!'
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-15
+------------------------------------------
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import { join } from 'path'
+const hbs = require('hbs') //☆
+
+
+async function bootstrap() {
+  const app = await NestFactory
+    .create<NestExpressApplication>(AppModule) //☆
+  app.setBaseViewsDir(join(__dirname, '..', 'views')) //☆
+  hbs.registerPartials(join(__dirname, '..', 'views', 'partials')) //☆
+  app.setViewEngine('hbs') //☆
+  await app.listen(3000)
+}
+bootstrap()
+
+
+
+------------------------------------------
+■リスト5-16
+------------------------------------------
+<h1 class="display-6 text-primary">
+  <strong>{{title}}</strong>
+</h1>
+<p>{{message}}</p>
+<hr>
+
+
+
+------------------------------------------
+■リスト5-17
+------------------------------------------
+<div class="my-3">&nbsp;</div>
+<div style="width:100%" 
+  class="fixed-bottom bg-secondary p-1">
+  <p class="text-center text-white m-0">
+    copyright 2022 SYODA-Tuyano.</p>
+</div>
+
+
+
+------------------------------------------
+■リスト5-18
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    {{>header}}
+    <p>※これがサンプルページのコンテンツです。</p>
+    {{>footer}}
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-19
+------------------------------------------
+// import { Controller, Render, Param, Body, Get, Post } from '@nestjs/common'
+
+
+@Get()
+@Render('index')
+index() {
+  return {
+    title: 'NestJS-MVC',
+    message: 'NestJS + hbs = MVC application!'
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-20
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    {{>header}}
+    <form method="post" action="/">
+      <div class="mb-3">
+        <label for="msg" class="form-label">Message</label>
+        <input type="text" class="form-control" 
+          id="msg" name="msg">
+      </div>
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" 
+          id="name" name="name">
+      </div>
+      <button type="submit" class="btn btn-secondary">送信</button>
+    </form>
+    {{>footer}}
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-21
+------------------------------------------
+export default class MsgData {
+  msg: string
+  name: string
+  posted: Date
+}
+
+
+
+------------------------------------------
+■リスト5-22
+------------------------------------------
+import MsgData from './Msgdata'
+const msgs = []
+
+
+
+------------------------------------------
+■リスト5-23
+------------------------------------------
+@Get()
+@Render('index')
+index() {
+  console.log(msgs)
+  return {
+    title: 'NestJS-MVC',
+    message: 'NestJS + hbs = MVC application!',
+    data:msgs
+  }
+}
+
+
+@Post()
+@Render('index')
+form(@Body() msg:MsgData) {
+  msg.posted = new Date()
+  msgs.unshift(msg)
+  return {
+    title: 'NestJS-MVC',
+    message: 'posted: ' + JSON.stringify(msg),
+    data:msgs
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-24
+------------------------------------------
+<table class="table">
+  <thead>
+    <tr><th>Message</th><th>Name</th><th>posted</th></tr>
+  </thead>
+  <tbody>
+    {{#each data}}
+      <tr>
+        <td>{{msg}}</td>
+        <td>{{name}}</td>
+        <td>{{posted}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+
+
+------------------------------------------
+■リスト5-25
+------------------------------------------
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import * as session from 'express-session' //☆
+import { join } from 'path'
+const hbs = require('hbs')
+
+
+async function bootstrap() {
+  const app = await NestFactory
+    .create<NestExpressApplication>(AppModule)
+  app.setBaseViewsDir(join(__dirname, '..', 'views'))
+  app.setViewEngine('hbs')
+  app.use(session({ //☆
+    secret: 'sample-secret-key', //☆
+    resave: false, //☆
+    saveUninitialized: false, //☆
+  })) //☆
+  hbs.registerPartials(join(__dirname, '..', 'views', 'partials'))
+  await app.listen(3000)
+}
+bootstrap()
+
+
+
+------------------------------------------
+■リスト5-26
+------------------------------------------
+<input type="text" class="form-control" 
+  id="name" name="name" value="{{username}}">
+
+
+
+------------------------------------------
+■リスト5-27
+------------------------------------------
+import { Controller, Render, Param, Body, Get, Post, Session } from '@nestjs/common'
+
+
+
+------------------------------------------
+■リスト5-28
+------------------------------------------
+@Get()
+@Render('index')
+index(@Session() session: Record<string, any>) {
+  const username = session.username ? session.username : '（未入力）'
+  return {
+    title: 'NestJS-MVC',
+    message: 'Username: ' + username,
+    username: session.username,
+    data:msgs
+  }
+}
+
+
+@Post()
+@Render('index')
+form(@Body() msg:MsgData, @Session() session: Record<string, any>) {
+  msg.posted = new Date()
+  session.username = msg.name
+  msgs.unshift(msg)
+  return {
+    title: 'NestJS-MVC',
+    message: 'posted:' + JSON.stringify(msg),
+    username: session.username,
+    data:msgs
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-29
+------------------------------------------
+{
+  "type": "sqlite",
+  "database": "database/db.sqlite3",
+  "entities": [
+    "dist/entities/**/*.entity.js"
+  ],
+  "migrations": [
+    "dist/migrations/**/*.js"
+  ]
+}
+
+
+
+------------------------------------------
+■リスト5-30
+------------------------------------------
+import { Entity, Column, PrimaryGeneratedColumn, 
+  CreateDateColumn, UpdateDateColumn } from 'typeorm'
+
+
+@Entity()
+export class Sampledata {
+  @PrimaryGeneratedColumn()
+  id: number
+
+
+  @Column({ length: 255 })
+  memo: string
+
+
+  @Column({ length: 10000, nullable:true })
+  mail: string
+
+
+  @Column({ length: 200, nullable:true })
+  url: string
+
+
+  @CreateDateColumn()
+  created: Date
+
+
+  @UpdateDateColumn()
+  updated: Date
+}
+
+
+
+------------------------------------------
+■リスト5-31
+------------------------------------------
+import { Module } from '@nestjs/common'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { ServeStaticModule } from '@nestjs/serve-static'
+import { join } from 'path'
+import { TypeOrmModule } from '@nestjs/typeorm' //☆
+import { SampledataModule } from './sampledata/sampledata.module' //☆
+
+
+@Module({
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
+    TypeOrmModule.forRoot(), //☆
+    SampledataModule, //☆
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+
+
+
+------------------------------------------
+■リスト5-32
+------------------------------------------
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { SampledataService } from './sampledata.service'
+import { SampledataController } from './sampledata.controller'
+import { Sampledata } from 'src/entities/sampledata.entity'
+
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Sampledata])],
+  providers: [SampledataService],
+  controllers: [SampledataController]
+})
+export class SampledataModule {}
+
+
+
+------------------------------------------
+■リスト5-33
+------------------------------------------
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { Sampledata } from 'src/entities/sampledata.entity'
+
+
+@Injectable()
+export class SampledataService {
+  constructor(
+    @InjectRepository(Sampledata)
+    private readonly sampledataRepository: Repository<Sampledata> 
+  ) {}
+
+
+  async getAll():Promise<Sampledata[]> {
+    return await this.sampledataRepository.find()
+  }
+}
+
+
+
+------------------------------------------
+■リスト5-34
+------------------------------------------
+import { Controller, Get } from '@nestjs/common';
+import { SampledataService } from './sampledata.service';
+
+
+@Controller('sampledata')
+export class SampledataController {
+  constructor(private readonly sampledataService: SampledataService) {}
+    
+  @Get('/')
+  root():Promise<Sampledata[]> {
+    return this.sampledataService.getAll()
+  }
+
+
+}
+
+
+
+------------------------------------------
+■リスト5-35
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2" onload="getData()">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを送信します。</p>
+    </div>    
+    <table class="table">
+      <thead>
+        <tr><th>Memo</th><th>Created</th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function getData() {
+        fetch('/sampledata')
+          .then(response => response.json())
+          .then(data => makeTable(data))
+      }
+
+
+      function makeTable(data) {
+        var result = ''
+        for (var item of data) {
+          result += `<tr><td>${item.memo}</td><td>${item.created}</td></tr>`
+        }
+        document.querySelector('#tbody').innerHTML = result
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-36
+------------------------------------------
+// import { InsertResult, Repository } from 'typeorm' // 修正
+
+
+async addSampledata(obj): Promise<InsertResult> {
+  return this.sampledataRepository.insert(obj)
+}
+
+
+
+------------------------------------------
+■リスト5-37
+------------------------------------------
+// import { InsertResult, UpdateResult, DeleteResult } from 'typeorm' // 追記
+
+
+@Post('/add')
+async add(@Body() data: Sampledata):Promise<InsertResult> {
+  return  this.sampledataService.addSampledata(data)
+}
+
+
+
+------------------------------------------
+■リスト5-38
+------------------------------------------
+<div class="mb-3">
+  <label for="name" class="form-label">Memo</label>
+  <textarea class="form-control" 
+    id="memo" name="memo"></textarea>
+</div>
+<div class="mb-3">
+  <label for="mail" class="form-label">Mail</label>
+  <input type="email" class="form-control" 
+    id="mail" name="mail">
+</div>
+<div class="mb-3">
+  <label for="url" class="form-label">Url</label>
+  <input type="url" class="form-control" 
+    id="url" name="url">
+</div>
+<button class="btn btn-secondary" onclick="doAction();">送信</button>
+
+
+
+------------------------------------------
+■リスト5-39
+------------------------------------------
+function doAction() {
+  const memo = document.querySelector('#memo').value
+  const mail = document.querySelector('#mail').value
+  const url = document.querySelector('#url').value
+  const data = {memo:memo, mail:mail, url:url}
+  const opt = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  }
+  fetch('/sampledata/add', opt)
+    .then(response => response.text())
+    .then(data => setData(data))
+}
+
+
+function setData(res) {
+  document.querySelector('#msg').textContent = '結果：' + res
+  document.querySelector('#memo').value = ''
+  document.querySelector('#mail').value = ''
+  document.querySelector('#url').value = ''
+  getData()
+}
+
+
+
+------------------------------------------
+■リスト5-40
+------------------------------------------
+async getById(id:number):Promise<Sampledata> {
+  return await this.sampledataRepository.findOne(id)
+}
+
+
+async update(data:Sampledata):Promise<Sampledata> {
+  const entity = await this.getById(data.id)
+  entity.memo = data.memo
+  entity.mail = data.mail
+  entity.url = data.url
+  return await this.sampledataRepository.save(entity)
+}
+
+
+
+------------------------------------------
+■リスト5-41
+------------------------------------------
+@Post('/id')
+async byId(@Body() data: any):Promise<Sampledata> {
+  return this.sampledataService.getById(data.id)
+}
+
+
+@Post('/edit')
+async edit(@Body() data: Sampledata):Promise<Sampledata> {
+  return this.sampledataService.update(data)
+}
+
+
+
+------------------------------------------
+■リスト5-42
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを更新します。</p>
+    </div>
+    <div class="mb-3">
+      <label for="id" class="form-label">ID</label>
+      <input type="number" class="form-control" 
+        id="id" name="id" onchange="doChange()">
+    </div>
+    <hr>
+    <div class="mb-3">
+      <label for="name" class="form-label">Memo</label>
+      <textarea class="form-control" 
+        id="memo" name="memo"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="mail" class="form-label">Mail</label>
+      <input type="email" class="form-control" 
+        id="mail" name="mail">
+    </div>
+    <div class="mb-3">
+      <label for="url" class="form-label">Url</label>
+      <input type="url" class="form-control" 
+        id="url" name="url">
+    </div>
+    <button class="btn btn-secondary" id="sendbtn"
+      onclick="doAction();" disabled>送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doChange() {
+        const id = document.querySelector('#id').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id:+id})
+        }
+        fetch('/sampledata/id', opt)
+          .then(response => response.json())
+          .then(data => showData(data))
+          .catch(error => clearData() )
+      }
+
+
+      function showData(data) {
+        document.querySelector('#msg').textContent = 'id=' + id + ' のデータ。'
+        document.querySelector('#memo').value = data.memo
+        document.querySelector('#mail').value = data.mail
+        document.querySelector('#url').value = data.url
+        document.querySelector('#sendbtn').disabled = false
+      }
+      function clearData() {
+        document.querySelector('#msg').textContent = '※データを更新します。'
+        document.querySelector('#memo').value = ''
+        document.querySelector('#mail').value = ''
+        document.querySelector('#url').value = ''
+        document.querySelector('#sendbtn').disabled = true
+      }
+
+
+      function doAction() {
+        const id = document.querySelector('#id').value
+        const memo = document.querySelector('#memo').value
+        const mail = document.querySelector('#mail').value
+        const url = document.querySelector('#url').value
+        const data = {id:id, memo:memo, mail:mail, url:url}
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+        fetch('/sampledata/edit', opt)
+          .then(response => response.text())
+          .then(data => setData(data))
+      }
+
+
+      function setData(res) {
+        document.querySelector('#msg').textContent = '結果：' + res
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-43
+------------------------------------------
+async delete(data:any):Promise<DeleteResult> {
+  return await this.sampledataRepository.delete(data.id)
+}
+
+
+
+------------------------------------------
+■リスト5-44
+------------------------------------------
+@Post('/delete')
+async delete(@Body() data: any):Promise<DeleteResult> {
+  return this.sampledataService.delete(data)
+}
+
+
+ ------------------------------------------
+■リスト5-45
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを削除します。</p>
+    </div>
+    <div class="mb-3">
+      <label for="id" class="form-label">ID</label>
+      <input type="number" class="form-control" 
+        id="id" name="id" onchange="doChange()">
+    </div>
+    <button class="btn btn-secondary" id="sendbtn"
+      onclick="doAction();" disabled>送信</button>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doChange() {
+        const id = document.querySelector('#id').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id:+id})
+        }
+        fetch('/sampledata/id', opt)
+          .then(response => response.json())
+          .then(data => showData(data))
+          .catch(error => clearData() )
+      }
+
+
+      function showData(data) {
+        document.querySelector('#msg').innerHTML = '<h6>このデータを削除します。</h6>'
+          + '<div>' + JSON.stringify(data) + '</div>'
+        document.querySelector('#sendbtn').disabled = false
+      }
+      function clearData() {
+        document.querySelector('#msg').textContent = '※データを削除します。'
+        document.querySelector('#sendbtn').disabled = true
+      }
+
+
+      function doAction() {
+        const id = document.querySelector('#id').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({id:id})
+        }
+        fetch('/sampledata/delete', opt)
+          .then(response => response.text())
+          .then(data => setData(data))
+      }
+
+
+      function setData(res) {
+        document.querySelector('#msg').textContent = '結果：' + res
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-46
+------------------------------------------
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>NestJS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="container mt-2" onload="getData()">
+    <h1 class="display-6 text-primary">
+      <strong>NestJS+TypeORM</strong>
+    </h1>
+    <div id="result" class="my-3">
+      <p id="msg">※データを検索します。</p>
+    </div>
+    <div class="mb-3">
+      <label for="find" class="form-label">Find</label>
+      <input type="text" class="form-control" 
+        id="find" name="find">
+    </div>
+    <button class="btn btn-secondary" onclick="doAction();">送信</button>
+    <hr>
+    <table class="table">
+      <thead>
+        <tr><th>Memo</th><th>Created</th></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="my-3">&nbsp;</div>
+    <div style="width:100%" 
+      class="fixed-bottom bg-secondary p-1">
+      <p class="text-center text-white m-0">
+        copyright 2022 SYODA-Tuyano.</p>
+    </div>
+    <script>
+      function doAction() {
+        const find = document.querySelector('#find').value
+        const opt = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({find:find})
+        }
+        fetch('/sampledata/find', opt)
+          .then(response => response.json())
+          .then(data => makeTable(data))
+      }
+      function makeTable(data) {
+        var result = ''
+        for (var item of data) {
+          result += `<tr><td>${item.memo}</td><td>${item.created}</td></tr>`
+        }
+        document.querySelector('#tbody').innerHTML = result
+      }
+    </script>
+  </body>
+</html>
+
+
+
+------------------------------------------
+■リスト5-47
+------------------------------------------
+@Post('/find')
+async find(@Body() data: any):Promise<Sampledata[]> {
+  return this.sampledataService.find(data)
+}
+
+
+
+------------------------------------------
+■リスト5-48
+------------------------------------------
+async find(data:any):Promise<Sampledata[]> {
+  return await this.sampledataRepository.find({mail:data.find})
+}
+
+
+
+------------------------------------------
+■リスト5-49
+------------------------------------------
+async find(data:any):Promise<Sampledata[]> {
+  return await this.sampledataRepository.find({memo:Like(`%${data.find}%`)})
+}
+
+
+
+------------------------------------------
+■リスト5-50
+------------------------------------------
+async getAll():Promise<Sampledata[]> {
+  return await this.sampledataRepository.find({
+    order:{created:'DESC'}
+  })
+}
+
