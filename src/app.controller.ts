@@ -7,11 +7,11 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
 
-@Get('/hello/:id?')
+@Get('/hello/*id')
 getHello(@Param() params): object {
   const id = params.id?? 0
   return this.appService.getHello(id)
   }
 }
 
-
+ 
