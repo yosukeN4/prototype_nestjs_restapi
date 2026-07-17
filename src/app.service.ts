@@ -18,6 +18,10 @@ export class AppService {
     };
   }
 
+  healthcheck() :string {
+    return 'Server is OK';
+  }
+
   addData(frm: FormData) {
     data.push(frm);
   }
