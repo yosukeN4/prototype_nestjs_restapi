@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common'
+import FormData from './formdata'
 
 
 const data = [
@@ -10,14 +11,19 @@ const data = [
 
 @Injectable()
 export class AppService {
-  
+
+
   getHello(id:number): object {
     const n = id < 0 ? 0 : id >= data.length ? data.length - 1 : id;
-    console.log(`id:${id} => n:${n}`)
     return {
       id:n,
       data:data[n],
       created:new Date()
-    };
+    }
+  }
+
+
+  addData(frm:FormData) {
+    data.push(frm)
   }
 }
