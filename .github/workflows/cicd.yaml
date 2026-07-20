@@ -4,5 +4,5 @@ jobs:
   hello:
     runs-on: ubuntu-latest
     steps:
-        - run: echo "Hora el Mundo"
         - uses: actions/checkout@v4
+        - run: echo "Hora el Mundo"
